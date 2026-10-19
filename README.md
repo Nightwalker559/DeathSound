@@ -7,12 +7,12 @@ The **Sound** tab plays a sound file from the list (or a random one on each deat
 
 ## Adding Your Own Sounds
 1. Put `.ogg` or `.mp3` files into `DeathSound\Media\Sounds\`.
-2. Rename `UpdateLists.bat.txt` (addon folder) to `UpdateLists.bat` and run it. It rewrites `Data\SoundList.lua`.
+2. Rename `UpdateLists.bat.txt` (addon folder) to `UpdateLists.bat` and run it. It rewrites `Data\MediaLists.lua`.
 3. `/reload`, then pick the sound in the options.
 
 ## Adding Your Own Emote Images
 1. Put `.png` (recommended) or `.tga` files, up to `128×128` px, into `DeathSound\Media\Images\`.
-2. Run `UpdateLists.bat`. It rewrites `Data\ImageList.lua`.
+2. Run `UpdateLists.bat`. It rewrites `Data\MediaLists.lua` (sounds and images in one file).
 3. `/reload`, then use the **Emote** tab:
    - Enable **Show image overlay on death** and pick an image (the preview on the right shows it), or enable **Random**
    - **Anchor to Release Spirit popup** places the image next to the death dialog

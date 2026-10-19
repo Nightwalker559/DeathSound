@@ -4,6 +4,12 @@ All notable changes to DeathSound are documented here.
 
 ---
 
+## 1.2.1
+
+### Changed
+- **One list file** — `Data\SoundList.lua` and `Data\ImageList.lua` are merged into `Data\MediaLists.lua` (sounds and images in one place, one line in the TOC); `UpdateLists.bat` writes this file. Run it again if you added your own sounds or images, the old two files are no longer loaded and can be deleted
+- `UpdateLists.bat` always writes both lists: an empty or missing `Media\Sounds` / `Media\Images` folder now gives an empty list instead of leaving a stale one behind
+
 ## 1.2.0
 
 ### Fixed

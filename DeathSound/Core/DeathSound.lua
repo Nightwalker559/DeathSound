@@ -2,7 +2,8 @@
 -- WoW Midnight 12.1
 -- Kern: Sound, Datenbank-Init, gemeinsame Helfer (ns.*), Optionspanel.
 -- Gemeinsamer Namespace `ns` (siehe TOC-Reihenfolge): ns.L (Locale), ns.SoundList,
--- ns.ImageList (generiert von UpdateLists.bat), ns.defaults, ns.skin (fuer ElvUI_Skin).
+-- ns.ImageList (beide in Data\MediaLists.lua, generiert von UpdateLists.bat),
+-- ns.defaults, ns.skin (fuer ElvUI_Skin).
 
 local ADDON_NAME, ns = ...
 local L = ns.L

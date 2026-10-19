@@ -15,8 +15,8 @@ L["TAB_GROUP"]            = "Gruppe"
 L["OPT_ENABLE"]           = "DeathSound aktivieren"
 L["OPT_ENABLE_TOOLTIP"]   = "Addon ein- oder ausschalten."
 
-L["DD_NO_SOUNDS"]         = "|cffff6600Keine Sounds in SoundList.lua eingetragen|r"
-L["DD_NO_IMAGES"]         = "|cffff6600Keine Bilder in ImageList.lua eingetragen|r"
+L["DD_NO_SOUNDS"]         = "|cffff6600Keine Sounds in MediaLists.lua eingetragen|r"
+L["DD_NO_IMAGES"]         = "|cffff6600Keine Bilder in MediaLists.lua eingetragen|r"
 
 -- Abschnitte und Hinweise
 L["SECTION_SOUND_FILE"]   = "Sounddatei"
@@ -73,7 +73,7 @@ L["MSG_NO_PARTY"]               = "Keine Gruppenfenster sichtbar. Tritt einer Gr
 -- Messages
 L["MSG_ENABLED"]          = "Aktiviert."
 L["MSG_DISABLED"]         = "Deaktiviert."
-L["MSG_NO_SOUNDS"]        = "Keine Sounds in SoundList.lua eingetragen!"
+L["MSG_NO_SOUNDS"]        = "Keine Sounds in MediaLists.lua eingetragen!"
 L["MSG_FILE_ERROR"]       = "Sound konnte nicht abgespielt werden: "
 L["MSG_FILE_HINT"]        = "Datei vorhanden? Nach dem Hinzufügen /reload ausführen!"
 L["MSG_INVALID_ID"]       = "Ungültige Sound-ID! Bitte eine Zahl größer als 0 eingeben."

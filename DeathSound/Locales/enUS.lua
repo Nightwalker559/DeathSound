@@ -23,8 +23,8 @@ L["TAB_GROUP"]            = "Group"
 L["OPT_ENABLE"]           = "Enable DeathSound"
 L["OPT_ENABLE_TOOLTIP"]   = "Toggle the addon on or off."
 
-L["DD_NO_SOUNDS"]         = "|cffff6600No sounds registered in SoundList.lua|r"
-L["DD_NO_IMAGES"]         = "|cffff6600No images registered in ImageList.lua|r"
+L["DD_NO_SOUNDS"]         = "|cffff6600No sounds registered in MediaLists.lua|r"
+L["DD_NO_IMAGES"]         = "|cffff6600No images registered in MediaLists.lua|r"
 
 -- Sections and hints
 L["SECTION_SOUND_FILE"]   = "Sound file"
@@ -81,7 +81,7 @@ L["MSG_NO_PARTY"]               = "No party frames visible. Join a group, or sho
 -- Messages
 L["MSG_ENABLED"]          = "Enabled."
 L["MSG_DISABLED"]         = "Disabled."
-L["MSG_NO_SOUNDS"]        = "No sounds found in SoundList.lua!"
+L["MSG_NO_SOUNDS"]        = "No sounds found in MediaLists.lua!"
 L["MSG_FILE_ERROR"]       = "Could not play sound: "
 L["MSG_FILE_HINT"]        = "File missing? Run /reload after adding new files!"
 L["MSG_INVALID_ID"]       = "Invalid Sound ID! Please enter a number greater than 0."
