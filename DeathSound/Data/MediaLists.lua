@@ -1,38 +1,38 @@
 -- ============================================================
 -- DeathSound - MediaLists.lua
 -- AUTOMATISCH GENERIERT von UpdateLists.bat
--- Generiert am: 19.10.2026
+-- Generiert am: 19.10.2026 um 12:50:18,39
 -- ============================================================
 
 local _, ns = ...
 
 -- Sounds (.ogg, .mp3)
 ns.SoundList = {
-    { name = "anime wow", file = "anime-wow.ogg" },
-    { name = "baby laughing", file = "baby-laughing.ogg" },
-    { name = "cthun you are already dead", file = "cthun-you-are-already-dead.ogg" },
-    { name = "Epic Fail", file = "Epic-Fail.ogg" },
-    { name = "error", file = "error.ogg" },
-    { name = "faaah", file = "faaah.ogg" },
-    { name = "goblin hue", file = "goblin-hue.ogg" },
-    { name = "goofy yell", file = "goofy-yell.ogg" },
-    { name = "gta v wasted", file = "gta-v-wasted.ogg" },
-    { name = "Heh heh yeah", file = "Heh heh yeah.ogg" },
-    { name = "Murloc Sound", file = "Murloc-Sound.ogg" },
-    { name = "Nelson HaHa", file = "Nelson_HaHa.ogg" },
-    { name = "oh daddy", file = "oh-daddy.ogg" },
-    { name = "oh daddy 2", file = "oh-daddy_2.ogg" },
-    { name = "oh Mommy", file = "oh-Mommy.ogg" },
-    { name = "perfect fart", file = "perfect-fart.ogg" },
-    { name = "pump shotgun", file = "pump-shotgun.ogg" },
-    { name = "roblox death sound", file = "roblox-death-sound.ogg" },
-    { name = "rues whistle", file = "rues_whistle.ogg" },
-    { name = "sad violin", file = "sad_violin.ogg" },
-    { name = "spongebob fail", file = "spongebob-fail.ogg" },
-    { name = "tuturu 1", file = "tuturu_1.ogg" },
-    { name = "wah wha fail", file = "wah_wha_fail.ogg" },
-    { name = "wilhelm scream", file = "wilhelm-scream.ogg" },
-    { name = "yippie", file = "yippie.ogg" },
+    { name = "Anime Wow", file = "Anime_Wow.ogg" },
+    { name = "Baby Laughing", file = "Baby_Laughing.ogg" },
+    { name = "Cthun You Are Already Dead", file = "Cthun_You_Are_Already_Dead.ogg" },
+    { name = "Epic Fail", file = "Epic_Fail.ogg" },
+    { name = "Error", file = "Error.ogg" },
+    { name = "Faaah", file = "Faaah.ogg" },
+    { name = "Goblin Hue", file = "Goblin_Hue.ogg" },
+    { name = "Goofy Yell", file = "Goofy_Yell.ogg" },
+    { name = "GTA V Wasted", file = "GTA_V_Wasted.ogg" },
+    { name = "Heh Heh Yeah", file = "Heh_Heh_Yeah.ogg" },
+    { name = "Murloc Sound", file = "Murloc_Sound.ogg" },
+    { name = "Nelson Haha", file = "Nelson_Haha.ogg" },
+    { name = "Oh Daddy", file = "Oh_Daddy.ogg" },
+    { name = "Oh Daddy 2", file = "Oh_Daddy_2.ogg" },
+    { name = "Oh Mommy", file = "Oh_Mommy.ogg" },
+    { name = "Perfect Fart", file = "Perfect_Fart.ogg" },
+    { name = "Pump Shotgun", file = "Pump_Shotgun.ogg" },
+    { name = "Roblox Death Sound", file = "Roblox_Death_Sound.ogg" },
+    { name = "Rues Whistle", file = "Rues_Whistle.ogg" },
+    { name = "Sad Violin", file = "Sad_Violin.ogg" },
+    { name = "Spongebob Fail", file = "Spongebob_Fail.ogg" },
+    { name = "Tuturu 1", file = "Tuturu_1.ogg" },
+    { name = "Wah Wha Fail", file = "Wah_Wha_Fail.ogg" },
+    { name = "Wilhelm Scream", file = "Wilhelm_Scream.ogg" },
+    { name = "Yippie", file = "Yippie.ogg" },
 }
 
 -- Bilder
@@ -40,22 +40,22 @@ ns.SoundList = {
 -- Legacy-Format:      .tga (wird weiterhin unterstuetzt)
 -- Max. Groesse im Spiel: 128x128 px
 ns.ImageList = {
-    { name = "Arthas cry", file = "Arthas_cry.png" },
-    { name = "Cat cry", file = "Cat_cry.png" },
-    { name = "Cat sad", file = "Cat_sad.png" },
-    { name = "Elf cry", file = "Elf_cry.png" },
-    { name = "Emoji scream", file = "Emoji_scream.png" },
-    { name = "Evoker cry", file = "Evoker_cry.png" },
-    { name = "HAHA", file = "HAHA.png" },
+    { name = "Arthas Cry", file = "Arthas_Cry.png" },
+    { name = "Cat Cry", file = "Cat_Cry.png" },
+    { name = "Cat Sad", file = "Cat_Sad.png" },
+    { name = "Elf Cry", file = "Elf_Cry.png" },
+    { name = "Emoji Scream", file = "Emoji_Scream.png" },
+    { name = "Evoker Cry", file = "Evoker_Cry.png" },
+    { name = "Haha", file = "Haha.png" },
     { name = "Jaina", file = "Jaina.png" },
-    { name = "Murloc cry", file = "Murloc_cry.png" },
-    { name = "Murloc ohno left", file = "Murloc_ohno_left.png" },
-    { name = "Murloc ohno right", file = "Murloc_ohno_right.png" },
-    { name = "Nightelf cry", file = "Nightelf_cry.png" },
-    { name = "Pepega cry", file = "Pepega_cry.png" },
-    { name = "PepeHands", file = "PepeHands.png" },
+    { name = "Murloc Cry", file = "Murloc_Cry.png" },
+    { name = "Murloc Ohno Left", file = "Murloc_Ohno_Left.png" },
+    { name = "Murloc Ohno Right", file = "Murloc_Ohno_Right.png" },
+    { name = "Nightelf Cry", file = "Nightelf_Cry.png" },
+    { name = "Pepega Cry", file = "Pepega_Cry.png" },
+    { name = "Pepe Hands", file = "Pepe_Hands.png" },
     { name = "Sadge", file = "Sadge.png" },
-    { name = "Sylvanas cry", file = "Sylvanas_cry.png" },
-    { name = "Thrall cry", file = "Thrall_cry.png" },
-    { name = "WoW Pepehands", file = "WoW_Pepehands.png" },
+    { name = "Sylvanas Cry", file = "Sylvanas_Cry.png" },
+    { name = "Thrall Cry", file = "Thrall_Cry.png" },
+    { name = "WoW Pepe Hands", file = "WoW_Pepe_Hands.png" },
 }

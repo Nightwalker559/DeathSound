@@ -173,6 +173,22 @@ local function MigrateIndexToName(db, nameKey, indexKey, list)
     db[indexKey] = nil
 end
 
+-- Gespeicherter Name nach Umbenennung der Dateien (1.2.1): gleicher Name ohne Gross-/Kleinschreibung
+-- und Trenner (z.B. "anime wow" -> "Anime Wow") -> auf den neuen Namen setzen
+local function Squash(s) return (s:lower():gsub("[^%w]", "")) end
+
+local function MigrateRenamedName(db, nameKey, list)
+    local name = db[nameKey]
+    if type(name) ~= "string" or name == "" then return end
+    for _, entry in ipairs(list) do
+        if entry.name == name then return end
+    end
+    local squashed = Squash(name)
+    for _, entry in ipairs(list) do
+        if Squash(entry.name) == squashed then db[nameKey] = entry.name return end
+    end
+end
+
 local function InitDB()
     if type(DeathSoundDB) ~= "table" then DeathSoundDB = {} end
     local db = DeathSoundDB
@@ -182,6 +198,9 @@ local function InitDB()
     MigrateIndexToName(db, "soundName",             "soundIndex",             ns.SoundList)
     MigrateIndexToName(db, "overlayImageName",      "overlayImageIndex",      ns.ImageList)
     MigrateIndexToName(db, "partyOverlayImageName", "partyOverlayImageIndex", ns.ImageList)
+    MigrateRenamedName(db, "soundName",             ns.SoundList)
+    MigrateRenamedName(db, "overlayImageName",      ns.ImageList)
+    MigrateRenamedName(db, "partyOverlayImageName", ns.ImageList)
 end
 
 -- ============================================================
