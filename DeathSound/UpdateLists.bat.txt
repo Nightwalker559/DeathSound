@@ -1,0 +1,172 @@
+@echo off
+setlocal EnableDelayedExpansion
+
+echo.
+echo  ==========================================
+echo   DeathSound - List Generator
+echo  ==========================================
+echo.
+
+set "ADDON_DIR=%~dp0"
+if "%ADDON_DIR:~-1%"=="\" set "ADDON_DIR=%ADDON_DIR:~0,-1%"
+
+set "SOUNDS_DIR=%ADDON_DIR%\Media\Sounds"
+set "IMAGES_DIR=%ADDON_DIR%\Media\Images"
+set "SOUND_OUT=%ADDON_DIR%\Data\SoundList.lua"
+set "IMAGE_OUT=%ADDON_DIR%\Data\ImageList.lua"
+
+echo  Addon-Ordner  : %ADDON_DIR%
+echo  Sounds-Ordner : %SOUNDS_DIR%
+echo  Images-Ordner : %IMAGES_DIR%
+echo.
+
+set ERRORS=0
+
+:: ==========================================
+:: SOUNDS
+:: ==========================================
+
+echo  --- Sounds ---
+echo.
+
+if not exist "%SOUNDS_DIR%\" (
+    echo  [FEHLER] Sounds-Ordner nicht gefunden!
+    echo  Erwartet: %SOUNDS_DIR%
+    echo.
+    set /a ERRORS+=1
+    goto :IMAGES
+)
+
+set SOUND_COUNT=0
+for %%F in ("%SOUNDS_DIR%\*.ogg") do set /a SOUND_COUNT+=1
+for %%F in ("%SOUNDS_DIR%\*.mp3") do set /a SOUND_COUNT+=1
+
+echo  Gefundene Sounddateien: %SOUND_COUNT%
+echo.
+
+if %SOUND_COUNT%==0 (
+    echo  [HINWEIS] Keine .ogg oder .mp3 Dateien gefunden.
+    echo  Lege zuerst Sounddateien in: %SOUNDS_DIR%
+    echo.
+    goto :IMAGES
+)
+
+> "%SOUND_OUT%" echo -- ============================================================
+>> "%SOUND_OUT%" echo -- DeathSound - SoundList.lua
+>> "%SOUND_OUT%" echo -- AUTOMATISCH GENERIERT von UpdateLists.bat
+>> "%SOUND_OUT%" echo -- Generiert am: %DATE% um %TIME%
+>> "%SOUND_OUT%" echo -- ============================================================
+>> "%SOUND_OUT%" echo.
+>> "%SOUND_OUT%" echo local _, ns = ...
+>> "%SOUND_OUT%" echo ns.SoundList = {
+
+for %%F in ("%SOUNDS_DIR%\*.ogg") do (
+    set "FNAME=%%~nxF"
+    set "DNAME=%%~nF"
+    set "DNAME=!DNAME:_= !"
+    set "DNAME=!DNAME:-= !"
+    >> "%SOUND_OUT%" echo     { name = "!DNAME!", file = "!FNAME!" },
+    echo   [+] %%~nxF
+)
+
+for %%F in ("%SOUNDS_DIR%\*.mp3") do (
+    set "FNAME=%%~nxF"
+    set "DNAME=%%~nF"
+    set "DNAME=!DNAME:_= !"
+    set "DNAME=!DNAME:-= !"
+    >> "%SOUND_OUT%" echo     { name = "!DNAME!", file = "!FNAME!" },
+    echo   [+] %%~nxF
+)
+
+>> "%SOUND_OUT%" echo }
+
+echo.
+echo  [OK] SoundList.lua geschrieben. (%SOUND_COUNT% Sound(e))
+echo.
+
+:: ==========================================
+:: IMAGES
+:: ==========================================
+
+:IMAGES
+echo  --- Emote-Bilder ---
+echo.
+
+if not exist "%IMAGES_DIR%\" (
+    echo  [FEHLER] Images-Ordner nicht gefunden!
+    echo  Erwartet: %IMAGES_DIR%
+    echo.
+    set /a ERRORS+=1
+    goto :SUMMARY
+)
+
+set IMAGE_COUNT=0
+for %%F in ("%IMAGES_DIR%\*.png") do set /a IMAGE_COUNT+=1
+for %%F in ("%IMAGES_DIR%\*.tga") do set /a IMAGE_COUNT+=1
+
+echo  Gefundene Bilddateien: %IMAGE_COUNT%
+echo.
+
+if %IMAGE_COUNT%==0 (
+    echo  [HINWEIS] Keine .png oder .tga Dateien gefunden.
+    echo  Lege zuerst Bilddateien in: %IMAGES_DIR%
+    echo.
+    goto :SUMMARY
+)
+
+> "%IMAGE_OUT%" echo -- ============================================================
+>> "%IMAGE_OUT%" echo -- DeathSound - ImageList.lua
+>> "%IMAGE_OUT%" echo -- AUTOMATISCH GENERIERT von UpdateLists.bat
+>> "%IMAGE_OUT%" echo -- Generiert am: %DATE% um %TIME%
+>> "%IMAGE_OUT%" echo -- ============================================================
+>> "%IMAGE_OUT%" echo -- Empfohlenes Format: .png (klein, Alpha-Kanal, universell)
+>> "%IMAGE_OUT%" echo -- Legacy-Format:      .tga (wird weiterhin unterstuetzt)
+>> "%IMAGE_OUT%" echo -- Max. Groesse im Spiel: 128x128 px
+>> "%IMAGE_OUT%" echo -- ============================================================
+>> "%IMAGE_OUT%" echo.
+>> "%IMAGE_OUT%" echo local _, ns = ...
+>> "%IMAGE_OUT%" echo ns.ImageList = {
+
+for %%F in ("%IMAGES_DIR%\*.png") do (
+    set "FNAME=%%~nxF"
+    set "DNAME=%%~nF"
+    set "DNAME=!DNAME:_= !"
+    set "DNAME=!DNAME:-= !"
+    >> "%IMAGE_OUT%" echo     { name = "!DNAME!", file = "!FNAME!" },
+    echo   [+] %%~nxF
+)
+
+for %%F in ("%IMAGES_DIR%\*.tga") do (
+    set "FNAME=%%~nxF"
+    set "DNAME=%%~nF"
+    set "DNAME=!DNAME:_= !"
+    set "DNAME=!DNAME:-= !"
+    >> "%IMAGE_OUT%" echo     { name = "!DNAME!", file = "!FNAME!" },
+    echo   [+] %%~nxF
+)
+
+>> "%IMAGE_OUT%" echo }
+
+echo.
+echo  [OK] ImageList.lua geschrieben. (%IMAGE_COUNT% Bild(er))
+echo.
+
+:: ==========================================
+:: SUMMARY
+:: ==========================================
+
+:SUMMARY
+echo  ==========================================
+if %ERRORS%==0 (
+    echo  Alle Listen erfolgreich aktualisiert.
+) else (
+    echo  [!] %ERRORS% Fehler aufgetreten - siehe oben.
+)
+echo.
+echo  WICHTIG: Danach im Spiel /reload ausfuehren!
+echo  (ein kompletter Neustart ist nicht noetig)
+echo  ==========================================
+
+:END
+echo.
+pause

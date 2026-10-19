@@ -1,0 +1,25 @@
+## Interface: 120100, 120105
+## Title: DeathSound — Sound & Emote
+## Notes: Spielt einen Sound und zeigt ein Emote wenn dein Char stirbt. | Plays a sound and shows an emote when your character dies.
+## Author: Nightwalker559
+## Version: 1.1.8
+## SavedVariables: DeathSoundDB
+## OptionalDeps: ElvUI
+
+# Locale
+Locales\Locale.lua
+Locales\enUS.lua
+Locales\deDE.lua
+
+# Listen (generiert von UpdateLists.bat)
+Data\SoundList.lua
+Data\ImageList.lua
+
+# Hauptlogik
+Core\DeathSound.lua
+
+# Todes-Overlay
+Core\DeathOverlay.lua
+
+# ElvUI Skin
+UI\ElvUI_Skin.lua
