@@ -12,7 +12,7 @@ local PREFIX     = "|cff00ccff[DeathSound]|r "
 
 ns.PREFIX          = PREFIX
 ns.DROPDOWN_WIDTH  = 160
-ns.TEST_BTN_OFFSET = 220
+ns.COL_WIDTH       = 350   -- linke Spalte der Tabs
 ns.SoundList       = ns.SoundList or {}
 ns.ImageList       = ns.ImageList or {}
 ns.isDead          = false
@@ -126,6 +126,39 @@ function ns.CreateListDropdown(parent, name, list, emptyText, getName, onSelect)
     return dd
 end
 
+-- ---- Layout-Helfer fuer das Optionspanel ----
+
+-- Abschnitts-Ueberschrift mit Linie darunter (Position setzt der Aufrufer)
+function ns.CreateHeader(parent, text, width)
+    local fs = parent:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    fs:SetText(text)
+    local line = parent:CreateTexture(nil, "ARTWORK")
+    line:SetColorTexture(0.3, 0.3, 0.3, 0.8)
+    line:SetSize(width, 1)
+    line:SetPoint("TOPLEFT", fs, "BOTTOMLEFT", 0, -4)
+    return fs
+end
+
+-- Grauer Erklaerungstext (Position setzt der Aufrufer)
+function ns.CreateHint(parent, text, width)
+    local fs = parent:CreateFontString(nil, "ARTWORK", "GameFontDisableSmall")
+    fs:SetJustifyH("LEFT")
+    fs:SetWidth(width)
+    fs:SetText(text)
+    return fs
+end
+
+-- Hinweis zu eigenen Dateien am unteren Rand eines Tabs, mit Linie darueber
+function ns.CreateFooter(parent, text)
+    local fs = ns.CreateHint(parent, text, 560)
+    fs:SetPoint("BOTTOMLEFT", parent, "BOTTOMLEFT", 0, 0)
+    local line = parent:CreateTexture(nil, "ARTWORK")
+    line:SetColorTexture(0.25, 0.25, 0.25, 0.6)
+    line:SetSize(560, 1)
+    line:SetPoint("BOTTOMLEFT", fs, "TOPLEFT", 0, 6)
+    return fs
+end
+
 -- ============================================================
 -- Datenbank
 -- ============================================================
@@ -218,47 +251,47 @@ end
 -- Options Panel
 -- ============================================================
 
-local function CreateInfoLine(parent, text, anchor, x, y)
-    local fs = parent:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-    fs:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", x, y)
-    fs:SetJustifyH("LEFT")
-    fs:SetWidth(540)
-    fs:SetText(text)
-    return fs
-end
+local COL_WIDTH     = ns.COL_WIDTH
+local CONTENT_WIDTH = 560
 
 local function BuildSoundTab(soundFrame)
     local db = DeathSoundDB
     local UpdateModeUI  -- forward declaration
 
+    -- ---- Sounddatei ----
+    local hdrFile = ns.CreateHeader(soundFrame, L("SECTION_SOUND_FILE"), COL_WIDTH)
+    hdrFile:SetPoint("TOPLEFT", soundFrame, "TOPLEFT", 0, 0)
+
     local fileCB = ns.CreateCheckBox(soundFrame, "DeathSoundFileCB", L("OPT_USE_FILE"), nil, not db.useGameSound,
         function() db.useGameSound = false; UpdateModeUI() end)
-    fileCB:SetPoint("TOPLEFT", soundFrame, "TOPLEFT", 0, 0)
-
-    local ddLabel = soundFrame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-    ddLabel:SetPoint("TOPLEFT", fileCB, "BOTTOMLEFT", 4, -8)
-    ddLabel:SetText(L("OPT_SELECT_SOUND"))
+    fileCB:SetPoint("TOPLEFT", hdrFile, "BOTTOMLEFT", 0, -10)
 
     local dd = ns.CreateListDropdown(soundFrame, "DeathSoundDropdown", ns.SoundList, L("DD_NO_SOUNDS"),
         function() return db.soundName end,
         function(entry) db.soundName = entry.name end)
-    dd:SetPoint("TOPLEFT", ddLabel, "BOTTOMLEFT", 0, -4)
+    dd:SetPoint("TOPLEFT", fileCB, "BOTTOMLEFT", 4, -8)
     dropdownRef = dd
 
-    local testFileBtn = ns.CreateButton(soundFrame, "DeathSoundTestButton", 120, 26,
+    local testFileBtn = ns.CreateButton(soundFrame, "DeathSoundTestButton", 100, 26,
         L("OPT_TEST_BUTTON"), L("OPT_TEST_TOOLTIP"), function() PlaySelectedSound(true) end)
-    testFileBtn:SetPoint("TOPLEFT", ddLabel, "BOTTOMLEFT", ns.TEST_BTN_OFFSET, -6)
+    testFileBtn:SetPoint("LEFT", dd, "RIGHT", 8, 0)
 
-    local randomCB = ns.CreateCheckBox(soundFrame, "DeathSoundRandomCB", L("OPT_RANDOM"), L("OPT_RANDOM_TOOLTIP"),
+    local randomCB = ns.CreateCheckBox(soundFrame, "DeathSoundRandomCB", L("OPT_RANDOM"), nil,
         db.randomSound, function(self) db.randomSound = self:GetChecked(); UpdateModeUI() end)
-    randomCB:SetPoint("LEFT", testFileBtn, "RIGHT", 12, 0)
+    randomCB:SetPoint("TOPLEFT", dd, "BOTTOMLEFT", -4, -6)
+    local randomHint = ns.CreateHint(soundFrame, L("OPT_RANDOM_TOOLTIP"), COL_WIDTH - 26)
+    randomHint:SetPoint("TOPLEFT", randomCB, "BOTTOMLEFT", 26, 0)
+
+    -- ---- WoW Sound-ID ----
+    local hdrID = ns.CreateHeader(soundFrame, L("SECTION_SOUND_ID"), COL_WIDTH)
+    hdrID:SetPoint("TOPLEFT", randomHint, "BOTTOMLEFT", -26, -22)
 
     local idCB = ns.CreateCheckBox(soundFrame, "DeathSoundIDCB", L("OPT_USE_ID"), nil, db.useGameSound,
         function() db.useGameSound = true; UpdateModeUI() end)
-    idCB:SetPoint("TOPLEFT", fileCB, "BOTTOMLEFT", 0, -70)
+    idCB:SetPoint("TOPLEFT", hdrID, "BOTTOMLEFT", 0, -10)
 
     local idLabel = soundFrame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-    idLabel:SetPoint("TOPLEFT", idCB, "BOTTOMLEFT", 0, -10)
+    idLabel:SetPoint("TOPLEFT", idCB, "BOTTOMLEFT", 4, -8)
     idLabel:SetText(L("OPT_ID_LABEL"))
 
     -- Die ID wird bei jeder Aenderung gespeichert (OnTextChanged), Escape stellt den Stand
@@ -281,21 +314,23 @@ local function BuildSoundTab(soundFrame)
         self:ClearFocus()
     end)
 
-    local testIDBtn = ns.CreateButton(soundFrame, "DeathSoundTestIDButton", 120, 26,
+    local testIDBtn = ns.CreateButton(soundFrame, "DeathSoundTestIDButton", 100, 26,
         L("OPT_TEST_BUTTON"), L("OPT_TEST_TOOLTIP"), function() PlayGameSound(idBox:GetText()) end)
     testIDBtn:SetPoint("LEFT", idBox, "RIGHT", 10, 0)
+
+    ns.CreateFooter(soundFrame, L("HINT_FILES_SOUND"))
 
     UpdateModeUI = function()
         local useID      = db.useGameSound
         local fileDimmed = useID
         local ddDimmed   = useID or db.randomSound
 
-        ddLabel:SetAlpha(fileDimmed and 0.4 or 1)
         dd:SetAlpha(ddDimmed and 0.4 or 1)
         dd:SetEnabled(not ddDimmed)
         testFileBtn:SetEnabled(not fileDimmed)
         randomCB:SetEnabled(not fileDimmed)
         randomCB:SetAlpha(fileDimmed and 0.4 or 1)
+        randomHint:SetAlpha(fileDimmed and 0.4 or 1)
 
         local idAlpha = useID and 1 or 0.4
         idBox:SetEnabled(useID)
@@ -309,38 +344,60 @@ local function BuildSoundTab(soundFrame)
     UpdateModeUI()
 end
 
+-- Tab-Button im flachen Stil: Text, Hover-Schimmer, farbige Linie wenn aktiv.
+local function CreateTab(parent, name, label)
+    local btn = CreateFrame("Button", name, parent)
+    btn:SetSize(110, 28)
+
+    btn.text = btn:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    btn.text:SetPoint("CENTER", 0, 1)
+    btn.text:SetText(label)
+
+    btn.underline = btn:CreateTexture(nil, "OVERLAY")
+    btn.underline:SetColorTexture(0, 0.8, 1, 1)
+    btn.underline:SetHeight(2)
+    btn.underline:SetPoint("BOTTOMLEFT", btn, "BOTTOMLEFT", 0, 0)
+    btn.underline:SetPoint("BOTTOMRIGHT", btn, "BOTTOMRIGHT", 0, 0)
+
+    local hover = btn:CreateTexture(nil, "HIGHLIGHT")
+    hover:SetAllPoints()
+    hover:SetColorTexture(1, 1, 1, 0.06)
+
+    function btn:SetActive(active)
+        self.underline:SetShown(active)
+        if active then
+            self.text:SetTextColor(0, 0.8, 1)
+        else
+            self.text:SetTextColor(0.6, 0.6, 0.6)
+        end
+    end
+    return btn
+end
+
 local function BuildOptionsPanel()
     local db = DeathSoundDB
 
     local panel = CreateFrame("Frame")
     panel.name  = ADDON_NAME
 
-    -- ---- Titel ----
+    -- ---- Kopf: Titel, Version, Untertitel ----
     local title = panel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
     title:SetPoint("TOPLEFT", 16, -16)
     title:SetText("|cff00ccff" .. L("ADDON_TITLE") .. "|r")
 
+    local version = panel:CreateFontString(nil, "ARTWORK", "GameFontDisableSmall")
+    version:SetPoint("LEFT", title, "RIGHT", 8, -1)
+    version:SetText("v" .. (C_AddOns.GetAddOnMetadata(ADDON_NAME, "Version") or "?"))
+
     local subtitle = panel:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
     subtitle:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -4)
+    subtitle:SetJustifyH("LEFT")
+    subtitle:SetWidth(CONTENT_WIDTH)
     subtitle:SetText(L("ADDON_SUBTITLE"))
 
-    local sep = panel:CreateTexture(nil, "ARTWORK")
-    sep:SetColorTexture(0.3, 0.3, 0.3, 0.8)
-    sep:SetSize(560, 1)
-    sep:SetPoint("TOPLEFT", subtitle, "BOTTOMLEFT", 0, -12)
-
-    -- ---- Haupt-Checkbox ----
     local cb = ns.CreateCheckBox(panel, "DeathSoundEnabledCB", L("OPT_ENABLE"), L("OPT_ENABLE_TOOLTIP"),
         db.enabled, function(self) db.enabled = self:GetChecked() end)
-    cb:SetPoint("TOPLEFT", sep, "BOTTOMLEFT", 0, -16)
-
-    -- ---- Kombinierter Info-Text (Sounds + Bilder) ----
-    local infoSounds = CreateInfoLine(panel,
-        "|cff888888" .. L("OPT_INFO_PATH") .. "  |cffffffff" .. L("OPT_INFO_PATH_VALUE"), cb, 4, -14)
-    local infoImages = CreateInfoLine(panel,
-        "|cff888888" .. L("OPT_INFO_PATH_IMG") .. "  |cffffffff" .. L("OPT_INFO_PATH_VALUE_IMG"), infoSounds, 0, -4)
-    local infoReg = CreateInfoLine(panel,
-        "|cff888888" .. L("OPT_INFO_REGISTER_COMBINED"), infoImages, 0, -4)
+    cb:SetPoint("TOPLEFT", subtitle, "BOTTOMLEFT", 0, -12)
 
     -- ---- Tabs ----
     local tabs = {
@@ -350,24 +407,24 @@ local function BuildOptionsPanel()
     }
     local prev
     for _, tab in ipairs(tabs) do
-        tab.button = ns.CreateButton(panel, tab.name, 120, 28, L(tab.label))
+        tab.button = CreateTab(panel, tab.name, L(tab.label))
         if prev then
-            tab.button:SetPoint("LEFT", prev, "RIGHT", 6, 0)
+            tab.button:SetPoint("LEFT", prev, "RIGHT", 4, 0)
         else
-            tab.button:SetPoint("TOPLEFT", infoReg, "BOTTOMLEFT", -4, -14)
+            tab.button:SetPoint("TOPLEFT", cb, "BOTTOMLEFT", 0, -12)
         end
         prev = tab.button
     end
 
     local tabSep = panel:CreateTexture(nil, "ARTWORK")
-    tabSep:SetColorTexture(0.25, 0.25, 0.25, 0.6)
-    tabSep:SetSize(560, 1)
-    tabSep:SetPoint("TOPLEFT", tabs[1].button, "BOTTOMLEFT", 0, -8)
+    tabSep:SetColorTexture(0.3, 0.3, 0.3, 0.8)
+    tabSep:SetSize(CONTENT_WIDTH, 1)
+    tabSep:SetPoint("TOPLEFT", tabs[1].button, "BOTTOMLEFT", 0, 0)
 
     for _, tab in ipairs(tabs) do
         tab.content = CreateFrame("Frame", nil, panel)
-        tab.content:SetPoint("TOPLEFT", tabSep, "BOTTOMLEFT", 0, -8)
-        tab.content:SetSize(560, 400)
+        tab.content:SetPoint("TOPLEFT", tabSep, "BOTTOMLEFT", 0, -14)
+        tab.content:SetSize(CONTENT_WIDTH, 350)
     end
 
     -- Die Frames fuer Overlay/Party-Emote existieren (ns.InitOverlays) bevor dieses Panel gebaut wird.
@@ -377,9 +434,8 @@ local function BuildOptionsPanel()
 
     local function SetTab(active)
         for i, tab in ipairs(tabs) do
-            local isActive = i == active
-            tab.content:SetShown(isActive)
-            tab.button:SetText((isActive and "|cff00ccff" or "|cff888888") .. L(tab.label) .. "|r")
+            tab.content:SetShown(i == active)
+            tab.button:SetActive(i == active)
         end
     end
     for i, tab in ipairs(tabs) do

@@ -1,7 +1,7 @@
 -- ============================================================
 -- DeathSound - SoundList.lua
 -- AUTOMATISCH GENERIERT von UpdateLists.bat
--- Generiert am: 08.08.2026 um 20:18:05,79
+-- Generiert am: 19.10.2026 um 10:15:26,85
 -- ============================================================
 
 local _, ns = ...

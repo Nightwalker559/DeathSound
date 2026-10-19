@@ -1,6 +1,6 @@
 ## Interface: 120100, 120105
 ## Title: DeathSound — Sound & Emote
-## Notes: Spielt einen Sound und zeigt ein Emote wenn dein Char stirbt. | Plays a sound and shows an emote when your character dies.
+## Notes: Spielt einen Sound und zeigt ein Emote, wenn du oder ein Gruppenmitglied stirbt. | Plays a sound and shows an emote when you or a party member dies.
 ## Author: Nightwalker559
 ## Version: 1.1.8
 ## X-Curse-Project-ID: 1547033
@@ -8,7 +8,6 @@
 ## OptionalDeps: ElvUI
 
 # Locale
-Locales\Locale.lua
 Locales\enUS.lua
 Locales\deDE.lua
 

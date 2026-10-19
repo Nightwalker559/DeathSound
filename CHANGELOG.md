@@ -15,6 +15,8 @@ All notable changes to DeathSound are documented here.
 - **Edit mode closed by revive/preview** — reviving or the 6 s preview timer hid the overlay while it was unlocked for positioning
 - **Unlock/Lock button label stale** — dying ends the edit mode; the button label is now refreshed when the Emote tab is shown
 - Unknown slash arguments (`/ds foo`) now print the command list instead of opening the options
+- **Party emote test needed a real group** — the test only looked for frames of party1-4, so it reported "No party frames visible" with ElvUI showing the group solo or in Edit Mode; it now uses whatever party frames are visible
+- **Party emote random** — with Random every party member gets their own image (never the last pick and none that is already shown), and the test shows one random image per visible frame; the dropdown is dimmed while Random is on
 
 ### Changed
 - **Shared namespace instead of globals** — `DeathSoundLocale`, `DEATHSOUND_SOUND_LIST`, `DEATHSOUND_IMAGE_LIST`, `DeathSound_OptionsPanel` and the `DeathSound_Build*Section` functions moved into the addon namespace; `UpdateLists.bat` writes `ns.SoundList` / `ns.ImageList` (run it again if you have your own generated lists)
@@ -24,6 +26,10 @@ All notable changes to DeathSound are documented here.
 - Checkboxes use `UICheckButtonTemplate` instead of the deprecated `InterfaceOptionsCheckButtonTemplate`
 - ElvUI skin delay uses `RunNextFrame`
 - **Folder structure** — files moved into `Core\`, `Data\`, `Locales\`, `UI\` and `Media\Sounds` / `Media\Images` like the other addons; `UpdateLists.bat` reads and writes the new locations
+- **Options redesign** — flat tabs with an underline for the active one, sections with headings, a preview of the selected image next to the settings (Emote and Group tab), explanatory hints instead of silent dimming, the Sound ID moved to its own section, the version shown next to the title
+- **File hints per tab** — the always-visible path block is replaced by a footer in the Sound, Emote and Group tabs ("Your own images: Media\Images, then run UpdateLists.bat and /reload")
+- Subtitle and TOC notes mention the party emote
+- **Locales** — `Locales\Locale.lua` merged into `enUS.lua` (two files: enUS, deDE)
 
 ### Removed
 - Redundant `OnHide` save of the Sound ID (the box already saves on every change), unused frame names and dead `UnitIsUnit(partyN, "player")` checks

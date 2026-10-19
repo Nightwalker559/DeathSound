@@ -1,7 +1,7 @@
 -- ============================================================
 -- DeathSound - ImageList.lua
 -- AUTOMATISCH GENERIERT von UpdateLists.bat
--- Generiert am: 08.08.2026 um 20:18:05,98
+-- Generiert am: 19.10.2026 um 10:15:27,00
 -- ============================================================
 -- Empfohlenes Format: .png (klein, Alpha-Kanal, universell)
 -- Legacy-Format:      .tga (wird weiterhin unterstuetzt)
