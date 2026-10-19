@@ -2,8 +2,8 @@
 
 Plays a sound and shows an emote image when your character dies, and optionally an emote next to the unit frame of a dead party member.
 
-## Installation
-Copy the `DeathSound` folder to `World of Warcraft\_retail_\Interface\AddOns\`.
+## Sound
+The **Sound** tab plays a sound file from the list (or a random one on each death), or a WoW sound ID from Wowhead. **Test** plays it right away.
 
 ## Adding Your Own Sounds
 1. Put `.ogg` or `.mp3` files into `DeathSound\Media\Sounds\`.
