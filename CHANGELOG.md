@@ -4,7 +4,7 @@ All notable changes to DeathSound are documented here.
 
 ---
 
-## [Unreleased]
+## 1.2.0
 
 ### Fixed
 - **Empty size / offset field reset the value to the default** — leaving the overlay size or party offset box empty (Enter or focus loss) set it back to 64 px / 4 px; it now keeps the current value
@@ -12,7 +12,7 @@ All notable changes to DeathSound are documented here.
 - **Party emote on the wrong frame with ElvUI** — ElvUI party frames were matched by index, so showing yourself in the party shifted every emote by one slot; frames are now matched by their unit like the default frames
 - **Party emote image changed for everyone** — a second party member dying re-rolled the random image of emotes that were already visible, and every health update of a dead member re-rolled it again; the image is now picked once per death and only for that slot
 - **Drag tooltip never showed** — the tooltip sat on a child frame with mouse disabled; it is now on the overlay itself (visible in edit mode)
-- **Edit mode closed by revive/preview** — reviving or the 6 s preview timer hid the overlay while it was unlocked for positioning
+- **Edit mode closed by revive** — reviving hid the overlay while it was unlocked for positioning
 - **Unlock/Lock button label stale** — dying ends the edit mode; the button label is now refreshed when the Emote tab is shown
 - Unknown slash arguments (`/ds foo`) now print the command list instead of opening the options
 - **Party emote test needed a real group** — the test only looked for frames of party1-4, so it reported "No party frames visible" with ElvUI showing the group solo or in Edit Mode; it now uses whatever party frames are visible
@@ -28,6 +28,7 @@ All notable changes to DeathSound are documented here.
 - **Folder structure** — files moved into `Core\`, `Data\`, `Locales\`, `UI\` and `Media\Sounds` / `Media\Images` like the other addons; `UpdateLists.bat` reads and writes the new locations
 - **Options redesign** — flat tabs with an underline for the active one, sections with headings, a preview of the selected image next to the settings (Emote and Group tab), explanatory hints instead of silent dimming, the Sound ID moved to its own section, the version shown next to the title
 - **File hints per tab** — the always-visible path block is replaced by a footer in the Sound, Emote and Group tabs ("Your own images: Media\Images, then run UpdateLists.bat and /reload")
+- **Emote test button** — no longer shows the overlay on screen for 6 seconds; with Random every click shows a new image in the preview (disabled without Random)
 - Subtitle and TOC notes mention the party emote
 - **Locales** — `Locales\Locale.lua` merged into `enUS.lua` (two files: enUS, deDE)
 
@@ -36,14 +37,14 @@ All notable changes to DeathSound are documented here.
 
 ---
 
-## [1.1.8] - 2026-10-07
+## 1.1.8
 
 ### Fixed
 - **Party emote shown inside raid instances** — a small group (e.g. two players) in a raid instance stays a regular party, so `IsInRaid()` returned false and the party overlay still appeared; the overlay is now also suppressed whenever `IsInInstance()` reports instance type `raid`, and re-evaluated on `PLAYER_ENTERING_WORLD`
 
 ---
 
-## [1.1.7] - 2026-10-06
+## 1.1.7
 
 ### Fixed
 - **Taint on `UIDROPDOWNMENU_MENU_LEVEL`** — the options dropdowns now use the modern menu API instead of the legacy `UIDropDownMenu_*` functions
@@ -53,21 +54,21 @@ All notable changes to DeathSound are documented here.
 - Toc updated
 ---
 
-## [1.1.6] - 2026-08-20
+## 1.1.6
 
 ### Fixed
 - **Party emote triggered by raid deaths** — `party1`-`party4` unit tokens remain valid while in a raid (pointing to your own subgroup), so a subgroup member's death in a raid incorrectly triggered the party overlay; `UpdatePartyOverlay` now also checks `IsInRaid()` and hides the overlay while in a raid
 
 ---
 
-## [1.1.5] - 2026-08-13
+## 1.1.5
 
 ### Fixed
 - **Party emote shown for offline members** — `UpdatePartyOverlay` did not check `UnitIsConnected`; a disconnected party member's stale health data could register as dead/ghost, triggering the emote overlay incorrectly
 
 ---
 
-## [1.1.4] - 2026-07-17
+## 1.1.4
 
 ### Changed
 - **TOC interface bumped to support 12.1** — added `120100` (Midnight Patch 12.1 "Curse of Ula'tek") alongside `120007` (12.0.7 "Revelations"); no API changes required for this addon
@@ -75,14 +76,14 @@ All notable changes to DeathSound are documented here.
 
 ---
 
-## [1.1.3] - 2026-06-20
+## 1.1.3
 
 ### Changed
 - TOC updated
 
 ---
 
-## [1.1.2] - 2026-06-16
+## 1.1.2
 
 ### Fixed
 - **Emote test button tooltip wrong duration** — `OPT_TEST_EMOTE_TOOLTIP` stated "3 seconds" in both EN and DE; corrected to "6 seconds" to match the actual timer
@@ -93,7 +94,7 @@ All notable changes to DeathSound are documented here.
 
 ---
 
-## [1.1.1] - 2026-06-06
+## 1.1.1
 
 ### Fixed
 - **Dropdown overlay button fragility** — all four dropdown overlay buttons previously used `dd.Button:GetFrameLevel()` to set their frame level; replaced with `dd:GetFrameLevel() + 2` which does not depend on a `.Button` child existing in the template
@@ -106,7 +107,7 @@ All notable changes to DeathSound are documented here.
 
 ---
 
-## [1.1.0] - 2026-06-02
+## 1.1.0
 
 ### Added
 - New emote images added to the Images folder
@@ -121,7 +122,7 @@ All notable changes to DeathSound are documented here.
 
 ---
 
-## [1.0.9] - 2026-05-31
+## 1.0.9
 
 ### New
 - **Party Member Emote** — new dedicated **Group** tab in the options panel with:
@@ -161,7 +162,7 @@ All notable changes to DeathSound are documented here.
 
 ---
 
-## [1.0.8] - 2026-05-29
+## 1.0.8
 
 ### Added
 - New emote images added to the Images folder
@@ -183,7 +184,7 @@ All notable changes to DeathSound are documented here.
 
 ---
 
-## [1.0.7] - 2026-05-28
+## 1.0.7
 
 ### Added
 - Options panel: two tabs — **Sound** and **Emote** — for a cleaner layout
@@ -205,7 +206,7 @@ All notable changes to DeathSound are documented here.
 
 ---
 
-## [1.0.6] - 2026-05-27
+## 1.0.6
 
 ### Added
 - **Death Overlay** — displays a custom `.tga` image on screen when your character dies
@@ -230,7 +231,7 @@ All notable changes to DeathSound are documented here.
 
 ---
 
-## [1.0.5] - 2026-05-22
+## 1.0.5
 
 ### Added
 - New sound files added to the Sounds folder
@@ -246,7 +247,7 @@ All notable changes to DeathSound are documented here.
 
 ---
 
-## [1.0.4] - 2026-05-20
+## 1.0.4
 
 ### Added
 - Random sound mode: plays a random sound from the list on each death, never repeating the same sound twice in a row
@@ -259,7 +260,7 @@ All notable changes to DeathSound are documented here.
 
 ---
 
-## [1.0.3] - 2026-05-20
+## 1.0.3
 
 ### Fixed
 - `buildOptionsPanel` was incorrectly declared as a global function — now properly local via forward declaration
@@ -272,7 +273,7 @@ All notable changes to DeathSound are documented here.
 
 ---
 
-## [1.0.2] - 2026-05-20
+## 1.0.2
 
 ### Added
 - WoW Sound ID mode: play any in-game sound by entering its ID from Wowhead
@@ -286,7 +287,7 @@ All notable changes to DeathSound are documented here.
 
 ---
 
-## [1.0.1] - 2026-05-19
+## 1.0.1
 
 ### Added
 - New sound files added to the Sounds folder
@@ -296,7 +297,7 @@ All notable changes to DeathSound are documented here.
 
 ---
 
-## [1.0.0] - 2026-05-19
+## 1.0.0
 
 ### Added
 - Initial release
