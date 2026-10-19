@@ -42,7 +42,7 @@ L["OPT_ID_LABEL"]         = "Sound-ID (von Wowhead):"
 -- Emote Tab
 L["OPT_OVERLAY_ENABLE"]         = "Bild-Overlay beim Tod anzeigen"
 L["OPT_OVERLAY_ENABLE_TOOLTIP"] = "Zeigt ein eigenes Bild wenn dein Charakter stirbt."
-L["OPT_TEST_EMOTE_TOOLTIP"]     = "Zeigt das Emote-Bild für 6 Sekunden. Mit Zufall bei jedem Klick ein neues Bild."
+L["OPT_TEST_EMOTE_TOOLTIP"]     = "Zeigt ein weiteres zufälliges Bild in der Vorschau. Nur mit Zufall verfügbar."
 L["OPT_RANDOM_EMOTE_TOOLTIP"]   = "Bei jedem Tod ein zufälliges Emote-Bild aus der Liste anzeigen."
 L["OPT_OVERLAY_SIZE"]           = "Größe:"
 L["OPT_OVERLAY_SIZE_UNIT"]      = "px (quadratisch, 32 - 128)"

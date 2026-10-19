@@ -45,7 +45,6 @@ local PARTY_SLOT = { party1 = 1, party2 = 2, party3 = 3, party4 = 4 }
 local overlayFrame   = nil
 local overlayTexture = nil
 local overlayBorder  = nil
-local testTimer      = nil  -- Handle fuer laufenden Vorschau-Timer
 local partyFrames    = {}   -- [1..4] = Overlay-Frame (mit .tex) fuer party1..party4
 local partyTestTimer = nil  -- Handle fuer laufenden Party-Vorschau-Timer
 local partyUpdatePending = false
@@ -140,27 +139,10 @@ local function ShowOverlay()
     end
 end
 
--- Bei Wiederbelebung verstecken, ausser eine Vorschau laeuft noch oder der Edit-Mode ist offen
+-- Bei Wiederbelebung verstecken, ausser der Edit-Mode ist offen
 local function HideOverlay()
-    if testTimer or not DeathSoundDB.overlayLocked then return end
+    if not DeathSoundDB.overlayLocked then return end
     overlayFrame:Hide()
-end
-
--- Test-Button: zeigt das Overlay kurz an, egal ob tot oder nicht
-local function PreviewOverlay()
-    if #ns.ImageList == 0 then
-        print(PREFIX .. L("DD_NO_IMAGES"))
-        return
-    end
-    if DeathSoundDB.overlayRandom then PickRandomImage("overlayImageName") end
-    ApplyImage()
-    PlaceOverlay()
-    overlayFrame:Show()
-
-    testTimer = RestartPreviewTimer(testTimer, function()
-        testTimer = nil
-        if not ns.isDead and DeathSoundDB.overlayLocked then overlayFrame:Hide() end
-    end)
 end
 
 local function CreateOverlayFrame()
@@ -482,12 +464,12 @@ function ns.BuildOverlaySection(imageFrame)
         end)
     dd:SetPoint("TOPLEFT", enableCB, "BOTTOMLEFT", 4, -8)
 
-    -- Test-Button: zeigt das Overlay kurz an (6 Sekunden), egal ob tot oder nicht.
-    -- Mit "Zufaellig" kommt bei jedem Klick ein neues Bild.
+    -- Test-Button: waehlt bei "Zufaellig" ein neues Bild und zeigt es in der Vorschau (nicht auf dem Bildschirm)
     local testEmoteBtn = ns.CreateButton(imageFrame, "DeathSoundTestEmoteButton", 100, 26,
         L("OPT_TEST_BUTTON"), L("OPT_TEST_EMOTE_TOOLTIP"),
         function()
-            PreviewOverlay()
+            PickRandomImage("overlayImageName")
+            ApplyImage()
             UpdatePreview()
         end)
     testEmoteBtn:SetPoint("LEFT", dd, "RIGHT", 8, 0)
@@ -594,6 +576,7 @@ function ns.BuildOverlaySection(imageFrame)
     -- Random-Checkbox dimmt auch den Dropdown (Auswahl irrelevant wenn Random)
     UpdateRandomMode = function()
         local dimDD = db.overlayRandom
+        testEmoteBtn:SetEnabled(dimDD)
         dd:SetAlpha(dimDD and 0.4 or 1)
         dd:SetEnabled(not dimDD)
     end
