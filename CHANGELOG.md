@@ -14,7 +14,7 @@ All notable changes to DeathSound are documented here.
 - **Emote images are 128×128** — all images were scaled down from 256×256 to the largest size the overlay can show (smaller download, same look)
 
 ### Removed
-- `Cat_Sad.png` (stretched in the square overlay); if it was your selected image the addon falls back to the first one in the list
+- Images `Cat_Sad.png`, `Sadge.png` and `Pepe_Hands.png`; if one of them was your selected image the addon falls back to the first one in the list
 
 ---
 
