@@ -1,7 +1,7 @@
 -- ============================================================
 -- DeathSound - MediaLists.lua
 -- AUTOMATISCH GENERIERT von UpdateLists.bat
--- Generiert am: 20.10.2026 um 16:55:51,38
+-- Generiert am: 20.10.2026 um 16:58:47,07
 -- ============================================================
 
 local _, ns = ...
@@ -46,6 +46,7 @@ ns.ImageList = {
     { name = "Elf Cry", file = "Elf_Cry.png" },
     { name = "Emoji Scream", file = "Emoji_Scream.png" },
     { name = "Evoker Cry", file = "Evoker_Cry.png" },
+    { name = "Ghost Cry", file = "Ghost_Cry.png" },
     { name = "Haha", file = "Haha.png" },
     { name = "Jaina", file = "Jaina.png" },
     { name = "Murloc Cry", file = "Murloc_Cry.png" },
