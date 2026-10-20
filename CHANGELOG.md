@@ -8,7 +8,7 @@ All notable changes to DeathSound are documented here.
 
 ### Added
 - **Addon icon** — DeathSound now has an icon in the AddOns list (`Media\icon.tga`, same style as the other addons)
-- **New emotes and sound** — images `Pumpkin_Cry.png` (crying jack-o'-lantern), `Snowman_Cry.png` and `Ghost_Cry.png`, sound `Headless_Horseman_Beckon.ogg`
+- **New emotes and sound** — images `Pumpkin_Cry.png` (crying jack-o'-lantern), `Snowman_Cry.png`, `Ghost_Cry.png` and `Headless_Horseman.png`, sound `Headless_Horseman_Beckon.ogg`
 
 ### Changed
 - **Emote images are 128×128** — all images were scaled down from 256×256 to the largest size the overlay can show (smaller download, same look)
