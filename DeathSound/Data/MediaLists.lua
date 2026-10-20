@@ -1,7 +1,7 @@
 -- ============================================================
 -- DeathSound - MediaLists.lua
 -- AUTOMATISCH GENERIERT von UpdateLists.bat
--- Generiert am: 19.10.2026 um 12:50:18,39
+-- Generiert am: 20.10.2026 um 16:35:48,49
 -- ============================================================
 
 local _, ns = ...
@@ -17,6 +17,7 @@ ns.SoundList = {
     { name = "Goblin Hue", file = "Goblin_Hue.ogg" },
     { name = "Goofy Yell", file = "Goofy_Yell.ogg" },
     { name = "GTA V Wasted", file = "GTA_V_Wasted.ogg" },
+    { name = "Headless Horseman Beckon", file = "Headless_Horseman_Beckon.ogg" },
     { name = "Heh Heh Yeah", file = "Heh_Heh_Yeah.ogg" },
     { name = "Murloc Sound", file = "Murloc_Sound.ogg" },
     { name = "Nelson Haha", file = "Nelson_Haha.ogg" },
@@ -54,6 +55,7 @@ ns.ImageList = {
     { name = "Nightelf Cry", file = "Nightelf_Cry.png" },
     { name = "Pepega Cry", file = "Pepega_Cry.png" },
     { name = "Pepe Hands", file = "Pepe_Hands.png" },
+    { name = "Pumpkin Cry", file = "Pumpkin_Cry.png" },
     { name = "Sadge", file = "Sadge.png" },
     { name = "Sylvanas Cry", file = "Sylvanas_Cry.png" },
     { name = "Thrall Cry", file = "Thrall_Cry.png" },

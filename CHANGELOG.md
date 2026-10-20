@@ -4,6 +4,14 @@ All notable changes to DeathSound are documented here.
 
 ---
 
+## 1.2.2
+
+### Added
+- **Addon icon** — DeathSound now has an icon in the AddOns list (`Media\icon.tga`, same style as the other addons)
+- **Halloween emote and sound** — new image `Pumpkin_Cry.png` (crying jack-o'-lantern) and new sound `Headless_Horseman_Beckon.ogg`
+
+---
+
 ## 1.2.1
 
 ### Changed

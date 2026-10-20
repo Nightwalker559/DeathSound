@@ -2,8 +2,9 @@
 ## Title: DeathSound — Sound & Emote
 ## Notes: Spielt einen Sound und zeigt ein Emote, wenn du oder ein Gruppenmitglied stirbt. | Plays a sound and shows an emote when you or a party member dies.
 ## Author: Nightwalker559
-## Version: 1.2.1
+## Version: 1.2.2
 ## X-Curse-Project-ID: 1547033
+## IconTexture: Interface\AddOns\DeathSound\Media\icon.tga
 ## SavedVariables: DeathSoundDB
 ## OptionalDeps: ElvUI
 
