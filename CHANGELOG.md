@@ -10,8 +10,14 @@ All notable changes to DeathSound are documented here.
 - **Addon icon** — DeathSound now has an icon in the AddOns list (`Media\icon.tga`, same style as the other addons)
 - **New emotes and sound** — images `Pumpkin_Cry.png` (crying jack-o'-lantern), `Snowman_Cry.png`, and `Ghost_Cry.png`, sound `Headless_Horseman_Beckon.ogg`
 
+### Fixed
+- **Edit mode survived `/reload`** — reloading while the overlay was unlocked left it hidden but still draggable and the button on "Lock Position"; edit mode now always starts locked
+
 ### Changed
 - **Emote images are 128×128** — all images were scaled down from 256×256 to the largest size the overlay can show (smaller download, same look)
+- **Cheaper `UNIT_HEALTH` handling** — the party emote checks whether the unit is dead before it looks at the group type
+- **Code cleanup** — one source table for the party frame lookup (ElvUI, raid-style party, `PartyFrame`) instead of two parallel chains, shared helpers for labels, dimming, the ElvUI skin registry and image lookup, and all code comments are English
+- Removed the "Compatibility" section from the README
 
 ### Removed
 - Images `Cat_Sad.png`, `Sadge.png` and `Pepe_Hands.png`; if one of them was your selected image the addon falls back to the first one in the list

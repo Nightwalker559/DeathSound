@@ -1,6 +1,6 @@
 -- DeathSound - ElvUI_Skin.lua
--- Optionaler ElvUI-Skin. Greift nur wenn ElvUI aktiv ist.
--- Die Widgets kommen aus der Registry ns.skin (siehe Helfer in DeathSound.lua).
+-- Optional ElvUI skin. Only applies when ElvUI is active.
+-- The widgets come from the ns.skin registry (see the helpers in DeathSound.lua).
 
 if not ElvUI then return end
 
@@ -18,9 +18,7 @@ local function ApplySkin()
     for _, cb  in ipairs(ns.skin.checkbox)   do S:HandleCheckBox(cb) end
     for _, box in ipairs(ns.skin.editbox)    do S:HandleEditBox(box) end
 
-    -- Moderne Dropdowns (DropdownButton): ElvUI skinnt sie selbst mit
-    -- S:HandleDropDownBox(frame, width) (siehe ElvUI Config.lua / RaidUtility.lua).
-    -- HandleDropDownBox setzt die Breite selbst, daher wird sie hier mitgegeben.
+    -- DropdownButton: HandleDropDownBox sets the width itself, so the registry stores it too.
     for _, entry in ipairs(ns.skin.dropdown) do S:HandleDropDownBox(entry[1], entry[2]) end
 end
 

@@ -1,21 +1,20 @@
 -- DeathSound - DeathOverlay.lua
--- WoW Midnight 12.1
--- Todes-Overlay (eigener Charakter) und Gruppen-Emote (Party-Mitglieder).
--- Wird von DeathSound.lua initialisiert (ns.InitOverlays) und ruft nur ns-Helfer von dort auf.
+-- Death overlay (own character) and group emote (party members).
+-- Initialised by DeathSound.lua (ns.InitOverlays); only calls ns helpers from there.
 
 local _, ns = ...
 local L      = ns.L
 local PREFIX = ns.PREFIX
 
 local IMAGE_PATH        = "Interface\\AddOns\\DeathSound\\Media\\Images\\"
-local PARTY_MAX_SIZE_TB = 96   -- max px fuer Oben/Unten
+local PARTY_MAX_SIZE_TB = 96   -- max px for top/bottom
 local PREVIEW_SECONDS   = 6
 
 for k, v in pairs({
     overlayAnchorToPopup  = false,
     overlayEnabled        = false,
     overlayHeight         = 64,
-    overlayImageName      = "",   -- gespeicherter Name des gewaehlten Emote-Bildes
+    overlayImageName      = "",   -- saved name of the selected emote image
     overlayLocked         = true,
     overlayPoint          = "CENTER",
     overlayRandom         = false,
@@ -25,14 +24,14 @@ for k, v in pairs({
     -- Party Overlay
     partyOverlayAnchor    = "LEFT",  -- LEFT | RIGHT | TOP | BOTTOM
     partyOverlayEnabled   = false,
-    partyOverlayImageName = "",   -- gespeicherter Name des gewaehlten Party-Emote-Bildes
-    partyOverlayOffset    = 4,       -- px Abstand zwischen Emote und PartyFrame
+    partyOverlayImageName = "",   -- saved name of the selected party emote image
+    partyOverlayOffset    = 4,       -- px gap between emote and party frame
     partyOverlayRandom    = false,
 }) do
     ns.defaults[k] = v
 end
 
--- Party-Emote: Seite des Party-Frames -> Ankerpunkte und Richtung des Abstands
+-- Party emote: side of the party frame -> anchor points and direction of the gap
 local PARTY_ANCHORS = {
     LEFT   = { point = "RIGHT",  relPoint = "LEFT",   x = -1, y = 0 },
     RIGHT  = { point = "LEFT",   relPoint = "RIGHT",  x = 1,  y = 0 },
@@ -41,39 +40,35 @@ local PARTY_ANCHORS = {
 }
 local PARTY_SLOT = { party1 = 1, party2 = 2, party3 = 3, party4 = 4 }
 
--- Modul-State
+-- Module state
 local overlayFrame   = nil
 local overlayTexture = nil
 local overlayBorder  = nil
-local partyFrames    = {}   -- [1..4] = Overlay-Frame (mit .tex) fuer party1..party4
-local partyTestTimer = nil  -- Handle fuer laufenden Party-Vorschau-Timer
+local partyFrames    = {}   -- [1..4] = overlay frame (with .tex) for party1..party4
+local partyTestTimer = nil  -- handle of the running party preview timer
 local partyUpdatePending = false
 
 -- ============================================================
--- Bilder
+-- Images
 -- ============================================================
 
-local function ImageTexturePath(name)
-    local list  = ns.ImageList
-    local entry = list[ns.ResolveIndex(list, name)]
+local function EntryPath(entry)
     return entry and (IMAGE_PATH .. entry.file)
 end
 
--- Waehlt ein zufaelliges Bild (nie das gleiche wie zuletzt) und speichert den Namen unter `key`.
+local function ImageTexturePath(name)
+    return EntryPath(ns.ResolveEntry(ns.ImageList, name))
+end
+
+-- Picks a random image (never the same as last time) and saves the name under `key`.
 local function PickRandomImage(key)
     local db, list = DeathSoundDB, ns.ImageList
     if #list <= 1 then return end
     db[key] = list[ns.PickRandomIndex(#list, ns.ResolveIndex(list, db[key]))].name
 end
 
--- Startet den Vorschau-Timer neu (ein laufender wird abgebrochen).
-local function RestartPreviewTimer(timer, fn)
-    if timer then timer:Cancel() end
-    return C_Timer.NewTimer(PREVIEW_SECONDS, fn)
-end
-
 -- ============================================================
--- Overlay Logik
+-- Overlay logic
 -- ============================================================
 
 local function SavePosition()
@@ -95,8 +90,8 @@ local function SetEditMode(enabled)
     overlayBorder:SetShown(enabled)
 end
 
--- Ankert das Overlay am "Geist freilassen"-Popup (links davon, Groesse = Popup-Hoehe).
--- Das Popup ist nicht zwingend StaticPopup1 (z.B. wenn schon ein anderes Popup offen ist).
+-- Anchors the overlay to the "Release Spirit" popup (to its left, size = popup height).
+-- The popup is not necessarily StaticPopup1 (e.g. when another popup is already open).
 local function AnchorToPopup()
     local _, popup = StaticPopup_Visible("DEATH")
     if not popup then return false end
@@ -114,7 +109,7 @@ local function ApplySavedPosition()
     overlayFrame:SetPoint(db.overlayPoint, UIParent, db.overlayPoint, db.overlayX, db.overlayY)
 end
 
--- Popup-Anker, wenn gewuenscht und das Popup offen ist, sonst gespeicherte Position
+-- Popup anchor if wanted and the popup is open, otherwise the saved position
 local function PlaceOverlay()
     if not (DeathSoundDB.overlayAnchorToPopup and AnchorToPopup()) then
         ApplySavedPosition()
@@ -128,18 +123,18 @@ local function ShowOverlay()
     if db.overlayRandom then PickRandomImage("overlayImageName") end
     ApplyImage()
 
-    -- Edit-Mode immer beenden beim echten Tod
+    -- Always end edit mode on a real death
     SetEditMode(false)
     PlaceOverlay()
     overlayFrame:Show()
 
     if db.overlayAnchorToPopup then
-        -- Der Text des DEATH-Popups wird verzoegert gesetzt (Deferred) und aendert dabei die Hoehe
+        -- The DEATH popup text is set deferred and changes the height
         C_Timer.After(0.15, AnchorToPopup)
     end
 end
 
--- Bei Wiederbelebung verstecken, ausser der Edit-Mode ist offen
+-- Hide on revive unless edit mode is open
 local function HideOverlay()
     if not DeathSoundDB.overlayLocked then return end
     overlayFrame:Hide()
@@ -156,7 +151,7 @@ local function CreateOverlayFrame()
         self:StopMovingOrSizing()
         SavePosition()
     end)
-    -- Maus ist nur im Edit-Mode aktiv, der Tooltip erscheint also nur dort
+    -- The mouse is only enabled in edit mode, so the tooltip only shows there
     ns.SetTooltip(overlayFrame, L("OVERLAY_DRAG_TIP"), "ANCHOR_TOP")
     overlayFrame:Hide()
 
@@ -173,44 +168,47 @@ local function CreateOverlayFrame()
     overlayBorder:SetBackdropBorderColor(0, 0.8, 1, 0.9)
 
     ApplyImage()
-    SetEditMode(not DeathSoundDB.overlayLocked)
+    SetEditMode(false)   -- edit mode does not persist across /reload (the overlay is hidden here)
 end
 
 -- ============================================================
--- Party Overlay Logik
+-- Party overlay logic
 -- ============================================================
 
--- Sucht unter den Frames <prefix>1..count (aus `parent`, sonst _G) den sichtbaren Frame der Einheit.
-local function FindUnitFrame(unit, parent, prefix, count)
-    parent = parent or _G
-    for i = 1, count do
-        local f = parent[prefix .. i]
-        if f and f:IsShown() and f.unit and UnitIsUnit(f.unit, unit) then return f end
-    end
+-- Sources of the group frames in priority order: ElvUI, the raid-style party
+-- (CompactPartyFrame) and PartyFrame.MemberFrame1..4. Frames are named <prefix>1..count and live
+-- in `parent()` (otherwise _G).
+local PARTY_SOURCES = {
+    { prefix = "ElvUF_PartyGroup1UnitButton", count = 5, available = function() return ElvUI end },
+    { prefix = "CompactPartyFrameMember",     count = 5,
+      available = function() return CompactPartyFrame and CompactPartyFrame:IsShown() end },
+    { prefix = "MemberFrame",                 count = 4, parent = function() return PartyFrame end,
+      available = function() return PartyFrame and PartyFrame:IsShown() end },
+}
+
+-- The visible frame number i of a source, or nil.
+local function SourceFrame(source, i)
+    local parent = source.parent and source.parent() or _G
+    local f = parent[source.prefix .. i]
+    if f and f:IsShown() then return f end
 end
 
--- Gibt den Party-Frame fuer slot 1-4 (Einheit "party<slot>") zurueck oder nil.
--- Unterstuetzt ElvUI, die Raid-Style-Party (CompactPartyFrame) und PartyFrame.MemberFrame1..4.
--- Die Zuordnung laeuft ueber die Einheit, nicht ueber den Frame-Index: ElvUI und CompactPartyFrame
--- koennen den eigenen Spieler mit anzeigen und verschieben die Positionen.
+-- Returns the party frame for slot 1-4 (unit "party<slot>"), or nil.
+-- Matching is done by unit, not by frame index: ElvUI and CompactPartyFrame
+-- can show the player too, which shifts the positions.
 local function GetPartyFrame(slot)
     local unit = "party" .. slot
-
-    if ElvUI then
-        local f = FindUnitFrame(unit, nil, "ElvUF_PartyGroup1UnitButton", 5)
-        if f then return f end
-    end
-
-    if CompactPartyFrame and CompactPartyFrame:IsShown() then
-        return FindUnitFrame(unit, nil, "CompactPartyFrameMember", 5)
-    end
-
-    if PartyFrame and PartyFrame:IsShown() then
-        return FindUnitFrame(unit, PartyFrame, "MemberFrame", 4)
+    for _, source in ipairs(PARTY_SOURCES) do
+        if source.available() then
+            for i = 1, source.count do
+                local f = SourceFrame(source, i)
+                if f and f.unit and UnitIsUnit(f.unit, unit) then return f end
+            end
+        end
     end
 end
 
--- Erstellt die 4 Party-Overlay-Frames einmalig.
+-- Creates the 4 party overlay frames once.
 local function CreatePartyOverlayFrames()
     for i = 1, 4 do
         local f = CreateFrame("Frame", "DeathSoundPartyOverlay" .. i, UIParent)
@@ -226,22 +224,22 @@ local function CreatePartyOverlayFrames()
     end
 end
 
--- Setzt Bild (nach Name) auf einem Party-Overlay.
+-- Sets the image (by name) on a party overlay.
 local function SetPartyImage(frame, name)
     frame.imageName = name
     frame.tex:SetTexture(ImageTexturePath(name))
 end
 
--- Setzt das gespeicherte Bild auf allen Party-Overlays (Auswahl im Dropdown).
+-- Sets the saved image on all party overlays (dropdown selection).
 local function ApplyPartyImage()
     for i = 1, 4 do
         SetPartyImage(partyFrames[i], DeathSoundDB.partyOverlayImageName)
     end
 end
 
--- Bildname fuer ein Party-Overlay: das gewaehlte Bild, oder bei "Zufaellig" ein eigenes Bild pro
--- Mitglied. Zufall nimmt nie das zuletzt gewaehlte und keins, das gerade an einem anderen
--- Party-Overlay zu sehen ist (solange die Liste dafuer gross genug ist).
+-- Image name for a party overlay: the selected image, or with "Random" an own image per
+-- member. Random never picks the last chosen one or one that is currently shown on another
+-- party overlay (as long as the list is big enough).
 local function PickPartyImageName(frame)
     local db, list = DeathSoundDB, ns.ImageList
     if not db.partyOverlayRandom or #list <= 1 then return db.partyOverlayImageName end
@@ -257,11 +255,11 @@ local function PickPartyImageName(frame)
     if #pool == 0 then pool = list end
 
     local name = pool[math.random(#pool)].name
-    db.partyOverlayImageName = name   -- "zuletzt gewaehlt"; die Vorschau im Panel zeigt es
+    db.partyOverlayImageName = name   -- "last chosen"; the preview in the panel shows it
     return name
 end
 
--- Groesse und Anker des Party-Emotes relativ zum Party-Frame setzen und anzeigen.
+-- Sets size and anchor of the party emote relative to the party frame and shows it.
 local function PositionPartyOverlay(frame, partyFrame)
     local db     = DeathSoundDB
     local anchor = PARTY_ANCHORS[db.partyOverlayAnchor] or PARTY_ANCHORS.LEFT
@@ -279,23 +277,24 @@ local function PositionPartyOverlay(frame, partyFrame)
     frame:Show()
 end
 
--- True in einer Raidgruppe ODER in einer Raid-Instanz. Letzteres ist noetig, weil
--- z.B. zu zweit in einem Raid die Gruppe eine normale Party bleibt (IsInRaid() = false).
+-- True in a raid group OR in a raid instance. The latter is needed because
+-- e.g. with two players in a raid the group stays a normal party (IsInRaid() = false).
 local function IsInRaidContent()
     if IsInRaid() then return true end
     local _, instanceType = IsInInstance()
     return instanceType == "raid"
 end
 
--- Zeigt oder versteckt das Party-Overlay fuer einen bestimmten Slot.
+-- Shows or hides the party overlay for a given slot.
 local function UpdatePartyOverlay(slot)
     local db    = DeathSoundDB
     local frame = partyFrames[slot]
     local unit  = "party" .. slot
 
+    -- UNIT_HEALTH fires often: cheap checks first, unit death before the raid query
     local partyFrame
-    if db.enabled and db.partyOverlayEnabled and not IsInRaidContent()
-        and UnitExists(unit) and UnitIsConnected(unit) and UnitIsDeadOrGhost(unit) then
+    if db.enabled and db.partyOverlayEnabled and UnitIsDeadOrGhost(unit)
+        and UnitExists(unit) and UnitIsConnected(unit) and not IsInRaidContent() then
         partyFrame = GetPartyFrame(slot)
     end
     if not partyFrame then
@@ -303,7 +302,7 @@ local function UpdatePartyOverlay(slot)
         return
     end
 
-    -- Beim Tod (Frame war noch versteckt) das Bild fuer genau diesen Slot waehlen
+    -- On death (frame was still hidden) pick the image for exactly this slot
     if not frame:IsShown() then
         SetPartyImage(frame, PickPartyImageName(frame))
     end
@@ -316,8 +315,8 @@ local function UpdateAllPartyOverlays()
     end
 end
 
--- Gruppen-/Zonenwechsel kommen gebuendelt; die Blizzard-Party-Frames werden erst im selben
--- Frame nach dem Event aktualisiert -> einmal im naechsten Frame auswerten.
+-- Group/zone changes come bundled; the Blizzard party frames are only updated in the same
+-- frame after the event -> evaluate once in the next frame.
 local function ScheduleUpdateAllPartyOverlays()
     if partyUpdatePending then return end
     partyUpdatePending = true
@@ -327,30 +326,23 @@ local function ScheduleUpdateAllPartyOverlays()
     end)
 end
 
--- Alle sichtbaren Frames des Gruppenfensters (max. 4), auch ohne Gruppe: ElvUI kann die Gruppe
--- solo anzeigen, Blizzard im Bearbeitungsmodus (dort mit dem eigenen Spieler als Platzhalter).
-local function CollectShownFrames(out, parent, prefix, count)
-    parent = parent or _G
-    for i = 1, count do
-        local f = parent[prefix .. i]
-        if f and f:IsShown() then out[#out + 1] = f end
-    end
-end
-
+-- All visible frames of the first source that has any (max. 4), also without a group: ElvUI can
+-- show the group solo, Blizzard in Edit Mode (there with the player as a placeholder).
 local function GetPreviewFrames()
     local out = {}
-    if ElvUI then CollectShownFrames(out, nil, "ElvUF_PartyGroup1UnitButton", 5) end
-    if #out == 0 and CompactPartyFrame and CompactPartyFrame:IsShown() then
-        CollectShownFrames(out, nil, "CompactPartyFrameMember", 5)
+    for _, source in ipairs(PARTY_SOURCES) do
+        if source.available() then
+            for i = 1, source.count do
+                local f = SourceFrame(source, i)
+                if f and #out < 4 then out[#out + 1] = f end
+            end
+            if #out > 0 then break end
+        end
     end
-    if #out == 0 and PartyFrame and PartyFrame:IsShown() then
-        CollectShownFrames(out, PartyFrame, "MemberFrame", 4)
-    end
-    while #out > 4 do out[#out] = nil end
     return out
 end
 
--- Test-Button: Emote an allen sichtbaren Gruppenfenstern anzeigen (mit Zufall je Fenster ein eigenes Bild)
+-- Test button: show the emote on all visible group frames (with Random, each frame gets its own image)
 local function PreviewPartyOverlays()
     if #ns.ImageList == 0 then
         print(PREFIX .. L("DD_NO_IMAGES"))
@@ -370,8 +362,9 @@ local function PreviewPartyOverlays()
         PositionPartyOverlay(frame, partyFrame)
     end
 
-    -- Nach der Vorschau wieder auf den echten Zustand zuruecksetzen
-    partyTestTimer = RestartPreviewTimer(partyTestTimer, function()
+    -- After the preview, reset to the real state (a running timer is replaced)
+    if partyTestTimer then partyTestTimer:Cancel() end
+    partyTestTimer = C_Timer.NewTimer(PREVIEW_SECONDS, function()
         partyTestTimer = nil
         UpdateAllPartyOverlays()
     end)
@@ -381,13 +374,13 @@ end
 -- Init / Events
 -- ============================================================
 
--- Wird von DeathSound.lua nach dem DB-Init und vor dem Optionspanel aufgerufen.
+-- Called by DeathSound.lua after the DB init and before the options panel.
 function ns.InitOverlays()
     CreateOverlayFrame()
     CreatePartyOverlayFrames()
 
     local f = CreateFrame("Frame")
-    -- UNIT_HEALTH nur fuer die Party-Einheiten (sonst feuert es fuer jede Einheit im Raid/Nameplates)
+    -- UNIT_HEALTH only for the party units (otherwise it fires for every unit in the raid/nameplates)
     f:RegisterUnitEvent("UNIT_HEALTH", "party1", "party2", "party3", "party4")
     f:RegisterEvent("GROUP_ROSTER_UPDATE")
     f:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -409,9 +402,9 @@ ns.HideDeathOverlay = HideOverlay
 -- ============================================================
 
 local COL_WIDTH = ns.COL_WIDTH
-local PREVIEW_X = 390   -- Vorschau-Spalte rechts neben den Einstellungen
+local PREVIEW_X = 390   -- preview column to the right of the settings
 
--- Vorschau-Kasten des gewaehlten Bildes; gibt eine Update-Funktion zurueck.
+-- Preview box of the selected image; returns an update function.
 local function CreatePreview(parent, getName)
     local hdr = ns.CreateHeader(parent, L("SECTION_PREVIEW"), 150)
     hdr:SetPoint("TOPLEFT", parent, "TOPLEFT", PREVIEW_X, 0)
@@ -435,9 +428,8 @@ local function CreatePreview(parent, getName)
     caption:SetPoint("TOPLEFT", box, "BOTTOMLEFT", 0, -4)
 
     return function()
-        local list  = ns.ImageList
-        local entry = list[ns.ResolveIndex(list, getName())]
-        tex:SetTexture(entry and (IMAGE_PATH .. entry.file) or nil)
+        local entry = ns.ResolveEntry(ns.ImageList, getName())
+        tex:SetTexture(EntryPath(entry))
         caption:SetText(entry and entry.name or "")
     end
 end
@@ -446,7 +438,7 @@ function ns.BuildOverlaySection(imageFrame)
     local db = DeathSoundDB
     local UpdatePopupMode, UpdateRandomMode, UpdateLockBtn, UpdatePreview  -- forward declarations
 
-    -- ---- Bild ----
+    -- ---- Image ----
     local hdrImage = ns.CreateHeader(imageFrame, L("SECTION_IMAGE"), COL_WIDTH)
     hdrImage:SetPoint("TOPLEFT", imageFrame, "TOPLEFT", 0, 0)
 
@@ -464,7 +456,7 @@ function ns.BuildOverlaySection(imageFrame)
         end)
     dd:SetPoint("TOPLEFT", enableCB, "BOTTOMLEFT", 4, -8)
 
-    -- Test-Button: waehlt bei "Zufaellig" ein neues Bild und zeigt es in der Vorschau (nicht auf dem Bildschirm)
+    -- Test button: with "Random" picks a new image and shows it in the preview (not on screen)
     local testEmoteBtn = ns.CreateButton(imageFrame, "DeathSoundTestEmoteButton", 100, 26,
         L("OPT_TEST_BUTTON"), L("OPT_TEST_EMOTE_TOOLTIP"),
         function()
@@ -484,7 +476,7 @@ function ns.BuildOverlaySection(imageFrame)
     local randomHint = ns.CreateHint(imageFrame, L("OPT_RANDOM_EMOTE_TOOLTIP"), COL_WIDTH - 26)
     randomHint:SetPoint("TOPLEFT", randomEmoteCB, "BOTTOMLEFT", 26, 0)
 
-    -- ---- Position und Groesse ----
+    -- ---- Position and size ----
     local hdrPos = ns.CreateHeader(imageFrame, L("SECTION_POSITION"), COL_WIDTH)
     hdrPos:SetPoint("TOPLEFT", randomHint, "BOTTOMLEFT", -26, -22)
 
@@ -498,9 +490,8 @@ function ns.BuildOverlaySection(imageFrame)
     local popupHint = ns.CreateHint(imageFrame, L("HINT_POPUP_MODE"), COL_WIDTH - 26)
     popupHint:SetPoint("TOPLEFT", popupCB, "BOTTOMLEFT", 26, 0)
 
-    local sizeLabel = imageFrame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+    local sizeLabel = ns.CreateLabel(imageFrame, L("OPT_OVERLAY_SIZE"))
     sizeLabel:SetPoint("TOPLEFT", popupCB, "BOTTOMLEFT", 4, -26)
-    sizeLabel:SetText(L("OPT_OVERLAY_SIZE"))
 
     local sizeBox = ns.CreateNumberBox(imageFrame, "DeathSoundSizeBox", 60, 3,
         function() return db.overlayWidth end,
@@ -513,9 +504,8 @@ function ns.BuildOverlaySection(imageFrame)
         end)
     sizeBox:SetPoint("LEFT", sizeLabel, "RIGHT", 10, 0)
 
-    local pxLabel = imageFrame:CreateFontString(nil, "ARTWORK", "GameFontDisableSmall")
+    local pxLabel = ns.CreateLabel(imageFrame, L("OPT_OVERLAY_SIZE_UNIT"), "GameFontDisableSmall")
     pxLabel:SetPoint("LEFT", sizeBox, "RIGHT", 6, 0)
-    pxLabel:SetText(L("OPT_OVERLAY_SIZE_UNIT"))
 
     -- ---- Lock/Unlock Button ----
     local lockBtn = ns.CreateButton(imageFrame, "DeathSoundLockButton", 150, 26, "",
@@ -544,7 +534,7 @@ function ns.BuildOverlaySection(imageFrame)
         end)
     resetBtn:SetPoint("LEFT", lockBtn, "RIGHT", 8, 0)
 
-    -- ---- Vorschau und Dateihinweis ----
+    -- ---- Preview and file hint ----
     UpdatePreview = CreatePreview(imageFrame, function() return db.overlayImageName end)
     ns.CreateFooter(imageFrame, L("HINT_FILES_IMAGE"))
 
@@ -552,33 +542,25 @@ function ns.BuildOverlaySection(imageFrame)
         lockBtn:SetText(db.overlayLocked and L("OPT_OVERLAY_UNLOCK") or L("OPT_OVERLAY_LOCK"))
     end
 
-    -- Tod beendet den Edit-Mode, Zufall aendert das Bild -> beim Anzeigen des Tabs auffrischen
+    -- Death ends edit mode and Random changes the image -> refresh when the tab is shown
     imageFrame:SetScript("OnShow", function()
         UpdateLockBtn()
         UpdatePreview()
     end)
 
-    -- ---- Modus-abhaengiges Abdunkeln (nach allen Widgets definiert) ----
+    -- ---- Mode-dependent dimming (defined after all widgets) ----
     UpdatePopupMode = function()
         local anchored = db.overlayAnchorToPopup
-        local alpha    = anchored and 0.4 or 1
-        sizeBox:SetEnabled(not anchored)
-        sizeBox:SetAlpha(alpha)
-        sizeLabel:SetAlpha(alpha)
-        pxLabel:SetAlpha(alpha)
-        lockBtn:SetEnabled(not anchored)
-        lockBtn:SetAlpha(alpha)
-        resetBtn:SetEnabled(not anchored)
-        resetBtn:SetAlpha(alpha)
+        for _, widget in ipairs({ sizeBox, sizeLabel, pxLabel, lockBtn, resetBtn }) do
+            ns.SetDimmed(widget, anchored)
+        end
         popupHint:SetShown(anchored)
     end
 
-    -- Random-Checkbox dimmt auch den Dropdown (Auswahl irrelevant wenn Random)
+    -- The Random checkbox also dims the dropdown (the selection is irrelevant with Random)
     UpdateRandomMode = function()
-        local dimDD = db.overlayRandom
-        testEmoteBtn:SetEnabled(dimDD)
-        dd:SetAlpha(dimDD and 0.4 or 1)
-        dd:SetEnabled(not dimDD)
+        ns.SetDimmed(dd, db.overlayRandom)
+        testEmoteBtn:SetEnabled(db.overlayRandom)
     end
 
     UpdateLockBtn()
@@ -588,14 +570,14 @@ function ns.BuildOverlaySection(imageFrame)
 end
 
 -- ============================================================
--- Party Section Builder (eigener Tab)
+-- Party Section Builder (own tab)
 -- ============================================================
 
 function ns.BuildPartySection(groupFrame)
     local db = DeathSoundDB
     local UpdatePreview, UpdateRandomMode  -- forward declarations
 
-    -- ---- Gruppen-Emote ----
+    -- ---- Group emote ----
     local hdrParty = ns.CreateHeader(groupFrame, L("SECTION_PARTY"), COL_WIDTH)
     hdrParty:SetPoint("TOPLEFT", groupFrame, "TOPLEFT", 0, 0)
 
@@ -638,16 +620,13 @@ function ns.BuildPartySection(groupFrame)
     local hdrPos = ns.CreateHeader(groupFrame, L("SECTION_PARTY_POSITION"), COL_WIDTH)
     hdrPos:SetPoint("TOPLEFT", randomHint, "BOTTOMLEFT", -26, -22)
 
-    local anchorLabel = groupFrame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+    local anchorLabel = ns.CreateLabel(groupFrame, L("OPT_PARTY_ANCHOR"), nil, 100)
     anchorLabel:SetPoint("TOPLEFT", hdrPos, "BOTTOMLEFT", 4, -18)
-    anchorLabel:SetJustifyH("LEFT")
-    anchorLabel:SetWidth(100)
-    anchorLabel:SetText(L("OPT_PARTY_ANCHOR"))
 
     local anchorDD = CreateFrame("DropdownButton", "DeathSoundPartyAnchorDropdown", groupFrame, "WowStyle1DropdownTemplate")
     anchorDD:SetPoint("LEFT", anchorLabel, "RIGHT", 8, 0)
     anchorDD:SetWidth(100)
-    ns.skin.dropdown[#ns.skin.dropdown + 1] = { anchorDD, 100 }
+    ns.RegisterSkin("dropdown", anchorDD, 100)
     ns.SetTooltip(anchorDD, L("OPT_PARTY_ANCHOR_TIP"))
 
     anchorDD:SetupMenu(function(_, root)
@@ -661,11 +640,8 @@ function ns.BuildPartySection(groupFrame)
         end
     end)
 
-    local offsetLabel = groupFrame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+    local offsetLabel = ns.CreateLabel(groupFrame, L("OPT_PARTY_OFFSET"), nil, 100)
     offsetLabel:SetPoint("TOPLEFT", anchorLabel, "BOTTOMLEFT", 0, -26)
-    offsetLabel:SetJustifyH("LEFT")
-    offsetLabel:SetWidth(100)
-    offsetLabel:SetText(L("OPT_PARTY_OFFSET"))
 
     local offsetBox = ns.CreateNumberBox(groupFrame, "DeathSoundPartyOffsetBox", 50, 3,
         function() return db.partyOverlayOffset end,
@@ -677,18 +653,16 @@ function ns.BuildPartySection(groupFrame)
         end)
     offsetBox:SetPoint("LEFT", offsetLabel, "RIGHT", 8, 0)
 
-    local offsetPxLabel = groupFrame:CreateFontString(nil, "ARTWORK", "GameFontDisableSmall")
+    local offsetPxLabel = ns.CreateLabel(groupFrame, "px (0 - 64)", "GameFontDisableSmall")
     offsetPxLabel:SetPoint("LEFT", offsetBox, "RIGHT", 6, 0)
-    offsetPxLabel:SetText("px (0 - 64)")
 
-    -- ---- Vorschau und Dateihinweis ----
+    -- ---- Preview and file hint ----
     UpdatePreview = CreatePreview(groupFrame, function() return db.partyOverlayImageName end)
     ns.CreateFooter(groupFrame, L("HINT_FILES_IMAGE"))
 
-    -- Random-Checkbox dimmt auch den Dropdown (Auswahl irrelevant wenn Random)
+    -- The Random checkbox also dims the dropdown (the selection is irrelevant with Random)
     UpdateRandomMode = function()
-        partyDD:SetAlpha(db.partyOverlayRandom and 0.4 or 1)
-        partyDD:SetEnabled(not db.partyOverlayRandom)
+        ns.SetDimmed(partyDD, db.partyOverlayRandom)
     end
 
     groupFrame:SetScript("OnShow", UpdatePreview)

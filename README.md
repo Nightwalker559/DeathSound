@@ -28,7 +28,4 @@ The **Group** tab shows an emote next to the unit frame of a dead party member (
 | `/ds test` | Play the current sound |
 | `/ds on` / `/ds off` | Enable / disable the addon |
 
-## Compatibility
-World of Warcraft: Midnight 12.1 and 12.1.5 (Interface 120100, 120105). ElvUI is skinned automatically.
-
 Author: Nightwalker559

@@ -1,5 +1,5 @@
 -- DeathSound - Locales\deDE.lua
--- Deutsch
+-- German
 
 if GetLocale() ~= "deDE" then return end
 
@@ -18,7 +18,7 @@ L["OPT_ENABLE_TOOLTIP"]   = "Addon ein- oder ausschalten."
 L["DD_NO_SOUNDS"]         = "|cffff6600Keine Sounds in MediaLists.lua eingetragen|r"
 L["DD_NO_IMAGES"]         = "|cffff6600Keine Bilder in MediaLists.lua eingetragen|r"
 
--- Abschnitte und Hinweise
+-- Sections and hints
 L["SECTION_SOUND_FILE"]   = "Sounddatei"
 L["SECTION_SOUND_ID"]     = "WoW-Sound-ID"
 L["SECTION_IMAGE"]        = "Bild"
