@@ -29,3 +29,7 @@ The **Group** tab shows an emote next to the unit frame of a dead party member (
 | `/ds on` / `/ds off` | Enable / disable the addon |
 
 Author: Nightwalker559
+
+## License
+
+[MIT with AI restriction](https://github.com/Nightwalker559/DeathSound/blob/main/LICENSE.md) (no use for AI or machine learning), copyright Nightwalker559.
