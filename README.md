@@ -30,6 +30,10 @@ The **Group** tab shows an emote next to the unit frame of a dead party member (
 
 Author: Nightwalker559
 
+## Feedback
+
+Found a bug or have an idea? [Open an issue on GitHub](https://github.com/Nightwalker559/DeathSound/issues).
+
 ## License
 
-[MIT with AI restriction](https://github.com/Nightwalker559/DeathSound/blob/main/LICENSE.md) (no use for AI or machine learning), copyright Nightwalker559.
+MIT with AI restriction (no use for AI or machine learning), see [LICENSE.md](https://github.com/Nightwalker559/DeathSound/blob/main/LICENSE.md).
