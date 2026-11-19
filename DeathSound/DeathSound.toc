@@ -1,4 +1,4 @@
-## Interface: 120100, 120105
+## Interface: 120100, 120105, 120107
 ## Title: DeathSound — Sound & Emote
 ## Notes: Spielt einen Sound und zeigt ein Emote, wenn du oder ein Gruppenmitglied stirbt. | Plays a sound and shows an emote when you or a party member dies.
 ## Author: Nightwalker559
