@@ -4,6 +4,7 @@
 -- which UI\ElvUI_Skin.lua walks.
 
 local _, ns = ...
+local L = ns.L
 
 -- Widgets that ElvUI_Skin touches (the helpers below register themselves).
 ns.skin = { button = {}, checkbox = {}, editbox = {}, dropdown = {} }
@@ -139,7 +140,7 @@ end
 local PREVIEW_X = 390   -- preview column to the right of the settings
 
 function ns.CreatePreview(parent, getName)
-    local hdr = ns.CreateHeader(parent, ns.L("SECTION_PREVIEW"), 150)
+    local hdr = ns.CreateHeader(parent, L("SECTION_PREVIEW"), 150)
     hdr:SetPoint("TOPLEFT", parent, "TOPLEFT", PREVIEW_X, 0)
 
     local box = CreateFrame("Frame", nil, parent, "BackdropTemplate")
