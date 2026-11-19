@@ -195,7 +195,7 @@ local function MigrateIndexToName(db, nameKey, indexKey, list)
     db[indexKey] = nil
 end
 
--- Saved name after the files were renamed (1.2.1): same name ignoring case
+-- Saved names from before the media files were renamed: same name ignoring case
 -- and separators (e.g. "anime wow" -> "Anime Wow") -> set to the new name
 local function Squash(s) return (s:lower():gsub("[^%w]", "")) end
 
