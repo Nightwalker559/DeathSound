@@ -1,6 +1,6 @@
 -- DeathSound - ElvUI_Skin.lua
 -- Optional ElvUI skin. Only applies when ElvUI is active.
--- The widgets come from the ns.skin registry (see the helpers in DeathSound.lua).
+-- The widgets come from the ns.skin registry (see the helpers in Widgets.lua).
 
 if not ElvUI then return end
 

@@ -92,14 +92,15 @@ end
 
 -- Anchors the overlay to the "Release Spirit" popup (to its left, size = popup height).
 -- The popup is not necessarily StaticPopup1 (e.g. when another popup is already open).
+-- Returns the applied size, or nil when the popup is not shown.
 local function AnchorToPopup()
     local _, popup = StaticPopup_Visible("DEATH")
-    if not popup then return false end
+    if not popup then return nil end
     local size = math.floor(popup:GetHeight())
     overlayFrame:SetSize(size, size)
     overlayFrame:ClearAllPoints()
     overlayFrame:SetPoint("RIGHT", popup, "LEFT", -8, 0)
-    return true
+    return size
 end
 
 local function ApplySavedPosition()
@@ -129,8 +130,14 @@ local function ShowOverlay()
     overlayFrame:Show()
 
     if db.overlayAnchorToPopup then
-        -- The DEATH popup text is set deferred and changes the height
-        C_Timer.After(0.15, AnchorToPopup)
+        -- Blizzard fills the DEATH popup text deferred, which changes its height. Re-anchor in the
+        -- next frame; if the size is still the placeholder size (or the popup is not up yet), the
+        -- text was not set by then and a short timer catches it.
+        local shownSize = math.floor(overlayFrame:GetWidth())
+        RunNextFrame(function()
+            local size = AnchorToPopup()
+            if not size or size == shownSize then C_Timer.After(0.15, AnchorToPopup) end
+        end)
     end
 end
 
