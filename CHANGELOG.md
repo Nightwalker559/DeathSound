@@ -9,6 +9,7 @@ All notable changes to DeathSound are documented here.
 ### Changed
 - **Popup anchor is faster** — with "Anchor to death popup" the overlay re-anchors in the next frame instead of after a fixed 0.15 s; the timer only remains as a fallback if Blizzard has not set the popup text by then
 - **Code cleanup** — `DeathSound.lua` is split by topic: `Shared.lua` (namespace, defaults, list helpers), `Database.lua`, `Sound.lua`, `Widgets.lua` (widget helpers), `OptionsPanel.lua`; `DeathSound.lua` keeps only events and slash commands
+- TOC: added Interface 16001 (Forever)
 
 ## 1.2.3
 
