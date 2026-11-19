@@ -31,6 +31,9 @@ end
 function ns.InitDB()
     if type(DeathSoundDB) ~= "table" then DeathSoundDB = {} end
     local db = DeathSoundDB
+    -- overlayWidth/overlayHeight were always equal; must run before the defaults fill overlaySize
+    if db.overlaySize == nil and type(db.overlayWidth) == "number" then db.overlaySize = db.overlayWidth end
+    db.overlayWidth, db.overlayHeight = nil, nil
     for k, v in pairs(ns.defaults) do
         if db[k] == nil then db[k] = v end
     end

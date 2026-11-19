@@ -1,6 +1,6 @@
 -- DeathSound - Widgets.lua
 -- Shared widget and layout helpers (ns.Create*, ns.SetTooltip, ns.SetDimmed) used by the
--- options panel and the overlay tabs. Every skinnable widget registers itself in ns.skin,
+-- options panel and its tabs. Every skinnable widget registers itself in ns.skin,
 -- which UI\ElvUI_Skin.lua walks.
 
 local _, ns = ...
@@ -133,4 +133,36 @@ function ns.CreateFooter(parent, text)
     line:SetSize(560, 1)
     line:SetPoint("BOTTOMLEFT", fs, "TOPLEFT", 0, 6)
     return fs
+end
+
+-- Preview box of the selected image (Emote and Group tab); returns an update function.
+local PREVIEW_X = 390   -- preview column to the right of the settings
+
+function ns.CreatePreview(parent, getName)
+    local hdr = ns.CreateHeader(parent, ns.L("SECTION_PREVIEW"), 150)
+    hdr:SetPoint("TOPLEFT", parent, "TOPLEFT", PREVIEW_X, 0)
+
+    local box = CreateFrame("Frame", nil, parent, "BackdropTemplate")
+    box:SetSize(150, 150)
+    box:SetPoint("TOPLEFT", hdr, "BOTTOMLEFT", 0, -10)
+    box:SetBackdrop({
+        bgFile   = "Interface\\Buttons\\WHITE8X8",
+        edgeFile = "Interface\\Buttons\\WHITE8X8",
+        edgeSize = 1,
+    })
+    box:SetBackdropColor(0, 0, 0, 0.35)
+    box:SetBackdropBorderColor(0.4, 0.4, 0.4, 0.8)
+
+    local tex = box:CreateTexture(nil, "ARTWORK")
+    tex:SetSize(128, 128)
+    tex:SetPoint("CENTER")
+
+    local caption = ns.CreateHint(parent, "", 150)
+    caption:SetPoint("TOPLEFT", box, "BOTTOMLEFT", 0, -4)
+
+    return function()
+        local entry = ns.ResolveEntry(ns.ImageList, getName())
+        tex:SetTexture(ns.ImagePath(entry))
+        caption:SetText(entry and entry.name or "")
+    end
 end

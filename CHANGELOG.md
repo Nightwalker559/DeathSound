@@ -4,6 +4,12 @@ All notable changes to DeathSound are documented here.
 
 ---
 
+## 1.2.5
+
+### Changed
+- **Code cleanup** — the Sound, Emote and Group tabs now live in their own files (`UI\SoundTab.lua`, `UI\EmoteTab.lua`, `UI\GroupTab.lua`); `DeathOverlay.lua` keeps only the overlay logic
+- **One overlay size setting** — `overlayWidth` and `overlayHeight` (always equal) are merged into `overlaySize`; your saved size is migrated automatically
+
 ## 1.2.4
 
 ### Changed

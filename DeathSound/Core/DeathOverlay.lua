@@ -1,6 +1,7 @@
 -- DeathSound - DeathOverlay.lua
--- Death overlay (own character) and group emote (party members).
--- Initialised by DeathSound.lua (ns.InitOverlays); only calls ns helpers from there.
+-- Death overlay (own character) and group emote (party members): logic and public API.
+-- Initialised by DeathSound.lua (ns.InitOverlays); the settings tabs (UI\EmoteTab.lua,
+-- UI\GroupTab.lua) use the ns.* functions exported at the end of this file.
 
 local _, ns = ...
 local L      = ns.L
@@ -13,12 +14,11 @@ local PREVIEW_SECONDS   = 6
 for k, v in pairs({
     overlayAnchorToPopup  = false,
     overlayEnabled        = false,
-    overlayHeight         = 64,
     overlayImageName      = "",   -- saved name of the selected emote image
     overlayLocked         = true,
     overlayPoint          = "CENTER",
     overlayRandom         = false,
-    overlayWidth          = 64,
+    overlaySize           = 64,   -- px, square
     overlayX              = 0,
     overlayY              = 0,
     -- Party Overlay
@@ -105,7 +105,7 @@ end
 
 local function ApplySavedPosition()
     local db = DeathSoundDB
-    overlayFrame:SetSize(db.overlayWidth, db.overlayHeight)
+    overlayFrame:SetSize(db.overlaySize, db.overlaySize)
     overlayFrame:ClearAllPoints()
     overlayFrame:SetPoint(db.overlayPoint, UIParent, db.overlayPoint, db.overlayX, db.overlayY)
 end
@@ -145,6 +145,35 @@ end
 local function HideOverlay()
     if not DeathSoundDB.overlayLocked then return end
     overlayFrame:Hide()
+end
+
+-- Lock/unlock button: edit mode shows the overlay for dragging, locking hides it again
+-- (unless the character is dead and the overlay belongs to that death).
+local function ToggleEditMode()
+    local unlocking = DeathSoundDB.overlayLocked
+    SetEditMode(unlocking)
+    if unlocking then
+        ApplyImage()
+        overlayFrame:Show()
+    elseif not ns.isDead then
+        overlayFrame:Hide()
+    end
+end
+
+local function ResetPosition()
+    local db = DeathSoundDB
+    db.overlayPoint = "CENTER"
+    db.overlayX     = 0
+    db.overlayY     = 0
+    ApplySavedPosition()
+end
+
+-- Clamps, saves and applies the overlay size; returns the value that was set.
+local function SetOverlaySize(val)
+    val = math.floor(math.min(128, math.max(32, val)))
+    DeathSoundDB.overlaySize = val
+    overlayFrame:SetSize(val, val)
+    return val
 end
 
 local function CreateOverlayFrame()
@@ -401,278 +430,18 @@ function ns.InitOverlays()
     end)
 end
 
-ns.ShowDeathOverlay = ShowOverlay
-ns.HideDeathOverlay = HideOverlay
-
 -- ============================================================
--- Options Section Builder
+-- Public API (settings tabs, DeathSound.lua)
 -- ============================================================
 
-local COL_WIDTH = ns.COL_WIDTH
-local PREVIEW_X = 390   -- preview column to the right of the settings
-
--- Preview box of the selected image; returns an update function.
-local function CreatePreview(parent, getName)
-    local hdr = ns.CreateHeader(parent, L("SECTION_PREVIEW"), 150)
-    hdr:SetPoint("TOPLEFT", parent, "TOPLEFT", PREVIEW_X, 0)
-
-    local box = CreateFrame("Frame", nil, parent, "BackdropTemplate")
-    box:SetSize(150, 150)
-    box:SetPoint("TOPLEFT", hdr, "BOTTOMLEFT", 0, -10)
-    box:SetBackdrop({
-        bgFile   = "Interface\\Buttons\\WHITE8X8",
-        edgeFile = "Interface\\Buttons\\WHITE8X8",
-        edgeSize = 1,
-    })
-    box:SetBackdropColor(0, 0, 0, 0.35)
-    box:SetBackdropBorderColor(0.4, 0.4, 0.4, 0.8)
-
-    local tex = box:CreateTexture(nil, "ARTWORK")
-    tex:SetSize(128, 128)
-    tex:SetPoint("CENTER")
-
-    local caption = ns.CreateHint(parent, "", 150)
-    caption:SetPoint("TOPLEFT", box, "BOTTOMLEFT", 0, -4)
-
-    return function()
-        local entry = ns.ResolveEntry(ns.ImageList, getName())
-        tex:SetTexture(EntryPath(entry))
-        caption:SetText(entry and entry.name or "")
-    end
-end
-
-function ns.BuildOverlaySection(imageFrame)
-    local db = DeathSoundDB
-    local UpdatePopupMode, UpdateRandomMode, UpdateLockBtn, UpdatePreview  -- forward declarations
-
-    -- ---- Image ----
-    local hdrImage = ns.CreateHeader(imageFrame, L("SECTION_IMAGE"), COL_WIDTH)
-    hdrImage:SetPoint("TOPLEFT", imageFrame, "TOPLEFT", 0, 0)
-
-    local enableCB = ns.CreateCheckBox(imageFrame, "DeathSoundOverlayCB", L("OPT_OVERLAY_ENABLE"),
-        L("OPT_OVERLAY_ENABLE_TOOLTIP"), db.overlayEnabled,
-        function(self) db.overlayEnabled = self:GetChecked() end)
-    enableCB:SetPoint("TOPLEFT", hdrImage, "BOTTOMLEFT", 0, -10)
-
-    local dd = ns.CreateListDropdown(imageFrame, "DeathSoundImageDropdown", ns.ImageList, L("DD_NO_IMAGES"),
-        function() return db.overlayImageName end,
-        function(entry)
-            db.overlayImageName = entry.name
-            ApplyImage()
-            UpdatePreview()
-        end)
-    dd:SetPoint("TOPLEFT", enableCB, "BOTTOMLEFT", 4, -8)
-
-    -- Test button: with "Random" picks a new image and shows it in the preview (not on screen)
-    local testEmoteBtn = ns.CreateButton(imageFrame, "DeathSoundTestEmoteButton", 100, 26,
-        L("OPT_TEST_BUTTON"), L("OPT_TEST_EMOTE_TOOLTIP"),
-        function()
-            PickRandomImage("overlayImageName")
-            ApplyImage()
-            UpdatePreview()
-        end)
-    testEmoteBtn:SetPoint("LEFT", dd, "RIGHT", 8, 0)
-
-    local randomEmoteCB = ns.CreateCheckBox(imageFrame, "DeathSoundRandomEmoteCB", L("OPT_RANDOM"), nil,
-        db.overlayRandom,
-        function(self)
-            db.overlayRandom = self:GetChecked()
-            UpdateRandomMode()
-        end)
-    randomEmoteCB:SetPoint("TOPLEFT", dd, "BOTTOMLEFT", -4, -6)
-    local randomHint = ns.CreateHint(imageFrame, L("OPT_RANDOM_EMOTE_TOOLTIP"), COL_WIDTH - 26)
-    randomHint:SetPoint("TOPLEFT", randomEmoteCB, "BOTTOMLEFT", 26, 0)
-
-    -- ---- Position and size ----
-    local hdrPos = ns.CreateHeader(imageFrame, L("SECTION_POSITION"), COL_WIDTH)
-    hdrPos:SetPoint("TOPLEFT", randomHint, "BOTTOMLEFT", -26, -22)
-
-    local popupCB = ns.CreateCheckBox(imageFrame, "DeathSoundPopupCB", L("OPT_OVERLAY_ANCHOR_POPUP"),
-        L("OPT_OVERLAY_ANCHOR_POPUP_TIP"), db.overlayAnchorToPopup,
-        function(self)
-            db.overlayAnchorToPopup = self:GetChecked()
-            UpdatePopupMode()
-        end)
-    popupCB:SetPoint("TOPLEFT", hdrPos, "BOTTOMLEFT", 0, -10)
-    local popupHint = ns.CreateHint(imageFrame, L("HINT_POPUP_MODE"), COL_WIDTH - 26)
-    popupHint:SetPoint("TOPLEFT", popupCB, "BOTTOMLEFT", 26, 0)
-
-    local sizeLabel = ns.CreateLabel(imageFrame, L("OPT_OVERLAY_SIZE"))
-    sizeLabel:SetPoint("TOPLEFT", popupCB, "BOTTOMLEFT", 4, -26)
-
-    local sizeBox = ns.CreateNumberBox(imageFrame, "DeathSoundSizeBox", 60, 3,
-        function() return db.overlayWidth end,
-        function(val)
-            val = math.floor(math.min(128, math.max(32, val)))
-            db.overlayWidth  = val
-            db.overlayHeight = val
-            overlayFrame:SetSize(val, val)
-            return val
-        end)
-    sizeBox:SetPoint("LEFT", sizeLabel, "RIGHT", 10, 0)
-
-    local pxLabel = ns.CreateLabel(imageFrame, L("OPT_OVERLAY_SIZE_UNIT"), "GameFontDisableSmall")
-    pxLabel:SetPoint("LEFT", sizeBox, "RIGHT", 6, 0)
-
-    -- ---- Lock/Unlock Button ----
-    local lockBtn = ns.CreateButton(imageFrame, "DeathSoundLockButton", 150, 26, "",
-        function() return db.overlayLocked and L("OPT_OVERLAY_UNLOCK_TIP") or L("OPT_OVERLAY_LOCK_TIP") end,
-        function()
-            local nowUnlocking = db.overlayLocked
-            SetEditMode(nowUnlocking)
-            if nowUnlocking then
-                ApplyImage()
-                overlayFrame:Show()
-            elseif not ns.isDead then
-                overlayFrame:Hide()
-            end
-            UpdateLockBtn()
-        end)
-    lockBtn:SetPoint("TOPLEFT", sizeLabel, "BOTTOMLEFT", -4, -14)
-
-    -- ---- Reset Position Button ----
-    local resetBtn = ns.CreateButton(imageFrame, "DeathSoundResetButton", 150, 26,
-        L("OPT_OVERLAY_RESET"), L("OPT_OVERLAY_RESET_TIP"),
-        function()
-            db.overlayPoint = "CENTER"
-            db.overlayX     = 0
-            db.overlayY     = 0
-            ApplySavedPosition()
-        end)
-    resetBtn:SetPoint("LEFT", lockBtn, "RIGHT", 8, 0)
-
-    -- ---- Preview and file hint ----
-    UpdatePreview = CreatePreview(imageFrame, function() return db.overlayImageName end)
-    ns.CreateFooter(imageFrame, L("HINT_FILES_IMAGE"))
-
-    UpdateLockBtn = function()
-        lockBtn:SetText(db.overlayLocked and L("OPT_OVERLAY_UNLOCK") or L("OPT_OVERLAY_LOCK"))
-    end
-
-    -- Death ends edit mode and Random changes the image -> refresh when the tab is shown
-    imageFrame:SetScript("OnShow", function()
-        UpdateLockBtn()
-        UpdatePreview()
-    end)
-
-    -- ---- Mode-dependent dimming (defined after all widgets) ----
-    UpdatePopupMode = function()
-        local anchored = db.overlayAnchorToPopup
-        for _, widget in ipairs({ sizeBox, sizeLabel, pxLabel, lockBtn, resetBtn }) do
-            ns.SetDimmed(widget, anchored)
-        end
-        popupHint:SetShown(anchored)
-    end
-
-    -- The Random checkbox also dims the dropdown (the selection is irrelevant with Random)
-    UpdateRandomMode = function()
-        ns.SetDimmed(dd, db.overlayRandom)
-        testEmoteBtn:SetEnabled(db.overlayRandom)
-    end
-
-    UpdateLockBtn()
-    UpdatePreview()
-    UpdateRandomMode()
-    UpdatePopupMode()
-end
-
--- ============================================================
--- Party Section Builder (own tab)
--- ============================================================
-
-function ns.BuildPartySection(groupFrame)
-    local db = DeathSoundDB
-    local UpdatePreview, UpdateRandomMode  -- forward declarations
-
-    -- ---- Group emote ----
-    local hdrParty = ns.CreateHeader(groupFrame, L("SECTION_PARTY"), COL_WIDTH)
-    hdrParty:SetPoint("TOPLEFT", groupFrame, "TOPLEFT", 0, 0)
-
-    local partyCB = ns.CreateCheckBox(groupFrame, "DeathSoundPartyCB", L("OPT_PARTY_ENABLE"),
-        L("OPT_PARTY_ENABLE_TOOLTIP"), db.partyOverlayEnabled,
-        function(self)
-            db.partyOverlayEnabled = self:GetChecked()
-            UpdateAllPartyOverlays()
-        end)
-    partyCB:SetPoint("TOPLEFT", hdrParty, "BOTTOMLEFT", 0, -10)
-
-    local partyDD = ns.CreateListDropdown(groupFrame, "DeathSoundPartyDropdown", ns.ImageList, L("DD_NO_IMAGES"),
-        function() return db.partyOverlayImageName end,
-        function(entry)
-            db.partyOverlayImageName = entry.name
-            ApplyPartyImage()
-            UpdatePreview()
-        end)
-    partyDD:SetPoint("TOPLEFT", partyCB, "BOTTOMLEFT", 4, -8)
-
-    local partyTestBtn = ns.CreateButton(groupFrame, "DeathSoundPartyTestButton", 100, 26,
-        L("OPT_TEST_BUTTON"), L("OPT_PARTY_TEST_TOOLTIP"),
-        function()
-            PreviewPartyOverlays()
-            UpdatePreview()
-        end)
-    partyTestBtn:SetPoint("LEFT", partyDD, "RIGHT", 8, 0)
-
-    local partyRandomCB = ns.CreateCheckBox(groupFrame, "DeathSoundPartyRandomCB", L("OPT_RANDOM"), nil,
-        db.partyOverlayRandom,
-        function(self)
-            db.partyOverlayRandom = self:GetChecked()
-            UpdateRandomMode()
-        end)
-    partyRandomCB:SetPoint("TOPLEFT", partyDD, "BOTTOMLEFT", -4, -6)
-    local randomHint = ns.CreateHint(groupFrame, L("OPT_PARTY_RANDOM_TOOLTIP"), COL_WIDTH - 26)
-    randomHint:SetPoint("TOPLEFT", partyRandomCB, "BOTTOMLEFT", 26, 0)
-
-    -- ---- Position ----
-    local hdrPos = ns.CreateHeader(groupFrame, L("SECTION_PARTY_POSITION"), COL_WIDTH)
-    hdrPos:SetPoint("TOPLEFT", randomHint, "BOTTOMLEFT", -26, -22)
-
-    local anchorLabel = ns.CreateLabel(groupFrame, L("OPT_PARTY_ANCHOR"), nil, 100)
-    anchorLabel:SetPoint("TOPLEFT", hdrPos, "BOTTOMLEFT", 4, -18)
-
-    local anchorDD = CreateFrame("DropdownButton", "DeathSoundPartyAnchorDropdown", groupFrame, "WowStyle1DropdownTemplate")
-    anchorDD:SetPoint("LEFT", anchorLabel, "RIGHT", 8, 0)
-    anchorDD:SetWidth(100)
-    ns.RegisterSkin("dropdown", anchorDD, 100)
-    ns.SetTooltip(anchorDD, L("OPT_PARTY_ANCHOR_TIP"))
-
-    anchorDD:SetupMenu(function(_, root)
-        for _, val in ipairs({ "LEFT", "RIGHT", "TOP", "BOTTOM" }) do
-            root:CreateRadio(L("OPT_PARTY_ANCHOR_" .. val),
-                function() return db.partyOverlayAnchor == val end,
-                function()
-                    db.partyOverlayAnchor = val
-                    UpdateAllPartyOverlays()
-                end)
-        end
-    end)
-
-    local offsetLabel = ns.CreateLabel(groupFrame, L("OPT_PARTY_OFFSET"), nil, 100)
-    offsetLabel:SetPoint("TOPLEFT", anchorLabel, "BOTTOMLEFT", 0, -26)
-
-    local offsetBox = ns.CreateNumberBox(groupFrame, "DeathSoundPartyOffsetBox", 50, 3,
-        function() return db.partyOverlayOffset end,
-        function(val)
-            val = math.floor(math.min(64, math.max(0, val)))
-            db.partyOverlayOffset = val
-            UpdateAllPartyOverlays()
-            return val
-        end)
-    offsetBox:SetPoint("LEFT", offsetLabel, "RIGHT", 8, 0)
-
-    local offsetPxLabel = ns.CreateLabel(groupFrame, "px (0 - 64)", "GameFontDisableSmall")
-    offsetPxLabel:SetPoint("LEFT", offsetBox, "RIGHT", 6, 0)
-
-    -- ---- Preview and file hint ----
-    UpdatePreview = CreatePreview(groupFrame, function() return db.partyOverlayImageName end)
-    ns.CreateFooter(groupFrame, L("HINT_FILES_IMAGE"))
-
-    -- The Random checkbox also dims the dropdown (the selection is irrelevant with Random)
-    UpdateRandomMode = function()
-        ns.SetDimmed(partyDD, db.partyOverlayRandom)
-    end
-
-    groupFrame:SetScript("OnShow", UpdatePreview)
-    UpdateRandomMode()
-    UpdatePreview()
-end
+ns.ShowDeathOverlay         = ShowOverlay
+ns.HideDeathOverlay         = HideOverlay
+ns.ToggleOverlayEditMode    = ToggleEditMode
+ns.ResetOverlayPosition     = ResetPosition
+ns.SetOverlaySize           = SetOverlaySize
+ns.ApplyImage               = ApplyImage
+ns.PickRandomImage          = PickRandomImage
+ns.ImagePath                = EntryPath
+ns.ApplyPartyImage          = ApplyPartyImage
+ns.PreviewPartyOverlays     = PreviewPartyOverlays
+ns.UpdateAllPartyOverlays   = UpdateAllPartyOverlays
